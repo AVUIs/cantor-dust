@@ -1,4 +1,5 @@
 'use strict';
 
-var worker = new Worker('worker/fractal.js');
-window.worker = worker;
+import cantor from 'cantor';
+
+window.cantor = cantor;

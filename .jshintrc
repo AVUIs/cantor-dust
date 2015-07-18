@@ -1,11 +1,14 @@
 {
   "globalstrict": true,
 
+  "esnext": true,
   "browser": true,
   "devel": true,
 
   "globals": {
+    "exports": true,
     "require": true,
+    "postMessage": true,
     "onmessage": true
   }
 }

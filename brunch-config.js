@@ -1,9 +1,11 @@
+'use strict';
+
 exports.config = {
   // See http://brunch.io/#documentation for docs.
   files: {
     javascripts: {
       joinTo: {
-        'main.js': 'src/main.js',
+        'main.js': /^src/,
       }
 
       // To use a separate vendor.js bundle, specify two files path
