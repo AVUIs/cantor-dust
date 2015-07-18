@@ -3,6 +3,13 @@ finna-be-tribble
 
 Special thanks to GitHub for the automated repo naming.
 
+## Installation
+
+```sh
+npm install
+npm install -g brunch
+```
+
 ## Usage
 
 ```sh
