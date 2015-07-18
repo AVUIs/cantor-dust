@@ -2,12 +2,9 @@
 
 var arr = new Float64Array(8);
 
-// Expected postMessage argument is an array pattern.
-//  i.e. [1.0, 0.5, 1.0]
-onmessage = function(message, x) {
-  postMessage(
-    cantor(message.data)
-  );
+onmessage = function(e) {
+  var data = cantor([0.33,1,0.75,0.5],7);
+  postMessage(data);
 };
 
 // 1.0
@@ -17,7 +14,7 @@ onmessage = function(message, x) {
 function cantor(pattern, iterations) {
   var arr = [1];
   pattern    = pattern || [1, 0.5, 1];
-  iterations = iterations || 5;
+  iterations = iterations || 10;
 
   while (iterations--) {
     arr = vecMult(pattern, arr);

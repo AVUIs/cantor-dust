@@ -6,6 +6,7 @@ exports.config = {
     javascripts: {
       joinTo: {
         'main.js': /^src/,
+        'vendor.js': /^vendor/,
       }
 
       // To use a separate vendor.js bundle, specify two files path
@@ -34,7 +35,7 @@ exports.config = {
   },
 
   paths: {
-    watched: ["src", "test"],
+      watched: ["src", "vendor"],
 
     // Where to compile files to
     public: "dist"
@@ -45,7 +46,7 @@ exports.config = {
     babel: {
       // Do not use ES6 compiler in vendor code
       ignore: [
-        /^src\/vendor/,
+        /^vendor/,
         'src/worker.js',
       ]
     }
