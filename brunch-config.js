@@ -4,7 +4,6 @@ exports.config = {
     javascripts: {
       joinTo: {
         'main.js': 'src/main.js',
-        'worker.js': 'src/worker.js',
       }
 
       // To use a separate vendor.js bundle, specify two files path
@@ -43,7 +42,16 @@ exports.config = {
   plugins: {
     babel: {
       // Do not use ES6 compiler in vendor code
-      ignore: [/^src\/vendor/]
+      ignore: [
+        /^src\/vendor/,
+        'src/worker.js',
+      ]
     }
-  }
+  },
+
+  modules: {
+    nameCleaner: function(path) {
+      return path.replace(/^src\//, '');
+    },
+  },
 };
