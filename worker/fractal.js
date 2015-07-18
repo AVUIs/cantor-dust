@@ -2,8 +2,10 @@
 
 var arr = new Float64Array(8);
 
-onmessage = function(e) {
-  var data = cantor([0.33,1,0.75,0.5],7);
+onmessage = function(args) {
+  var pattern    = args.data[0] || [0.33,1,0.75,0.5],
+      iterations = args.data[1] || 7,
+      data       = cantor(pattern, iterations);
   postMessage(data);
 };
 
