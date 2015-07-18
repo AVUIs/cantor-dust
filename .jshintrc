@@ -1,0 +1,11 @@
+{
+  "globalstrict": true,
+
+  "browser": true,
+  "devel": true,
+
+  "globals": {
+    "require": true,
+    "onmessage": true
+  }
+}
