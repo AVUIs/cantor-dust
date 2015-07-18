@@ -1,0 +1,28 @@
+{
+  "name": "finna-be-tribble",
+  "version": "0.0.1",
+  "description": "Fractal audio synthesis",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AVUIs/finna-be-tribble.git"
+  },
+  "author": "Louis Pilfold <louis@lpil.uk>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AVUIs/finna-be-tribble/issues"
+  },
+  "homepage": "https://github.com/AVUIs/finna-be-tribble",
+  "dependencies": {
+    "brunch": "^1.8.1",
+    "babel-brunch": "^5.1.1",
+    "clean-css-brunch": ">= 1.0 < 1.8",
+    "css-brunch": ">= 1.0 < 1.8",
+    "javascript-brunch": ">= 1.0 < 1.8",
+    "sass-brunch": "^1.8.10",
+    "uglify-js-brunch": ">= 1.0 < 1.8"
+  }
+}

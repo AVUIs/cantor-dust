@@ -3,6 +3,13 @@ finna-be-tribble
 
 Special thanks to GitHub for the automated repo naming.
 
+## Usage
+
+```sh
+brunch watch -s
+# And then navigate to http://localhost:3333/
+```
+
 ## Theory
 
 For a pattern of “1, 0.5, 1” (the default for this sketch), the first three
