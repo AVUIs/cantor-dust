@@ -1,7 +1,8 @@
-finna-be-tribble
-================
+Cantor Dust
+===========
 
-Special thanks to GitHub for the automated repo naming.
+Fractal audio synthesis.
+
 
 ## Installation
 
@@ -9,6 +10,7 @@ Special thanks to GitHub for the automated repo naming.
 npm install
 npm install -g brunch
 ```
+
 
 ## Usage
 
@@ -31,6 +33,7 @@ iterations are:
 ```
 
 And the last iteration is our wavetable. Banging.
+
 
 ## References
 
