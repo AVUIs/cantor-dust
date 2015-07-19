@@ -18,7 +18,7 @@ function cantor(pattern, iterations) {
   iterations = iterations || 10;
 
   while (iterations--) {
-    arr = vecMult(pattern, arr);
+      arr = vecMult(pattern, arr);
   }
   return arr;
 }

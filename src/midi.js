@@ -2,7 +2,6 @@
 
 var midiAccess;
 
-
 var midicontroller = {},
     // TODO: remove
     launchpad = midicontroller;
