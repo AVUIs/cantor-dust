@@ -46,7 +46,12 @@ window.generate = function makeNoise(pattern, iterations) {
 // Swaps the waiting wavetable for the playing wavetable for source `i`
 // Because it swaps you can effectively undo your decision by running it again
 window.load = function load(i) {
-  var previous = sources[i].getChannelData(0);
-  play(i, fractal);
-  fractal = previous;
+  var previous,
+      next   = fractal,
+      source = sources[i];
+  if (source) {
+    previous = source.buffer.getChannelData(0);
+    fractal  = previous;
+  }
+  play(i, next);
 };
