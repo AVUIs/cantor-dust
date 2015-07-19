@@ -1,5 +1,9 @@
 'use strict';
 
+import midi from 'midi';
+window.midi = midi;
+
+
 var audioCtxConstructor = (window.AudioContext || window.webkitAudioContext),
     audioCtx = new audioCtxConstructor(),
     sources  = [],
@@ -42,6 +46,7 @@ window.generate = function makeNoise(pattern, iterations) {
   worker.postMessage([pattern, iterations]);
 };
 
+window.sources = sources;
 
 // Swaps the waiting wavetable for the playing wavetable for source `i`
 // Because it swaps you can effectively undo your decision by running it again
