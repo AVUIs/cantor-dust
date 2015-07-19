@@ -2,8 +2,10 @@
 
 var midiAccess;
 
-// TODO: remove
-var launchpad = {};
+
+var midicontroller = {},
+    // TODO: remove
+    launchpad = midicontroller;
 
 navigator.requestMIDIAccess().then(
   e => { midiAccess = e; },
@@ -29,7 +31,7 @@ function getDevice(cb, nameRegex) {
   cb(input, output);
 }
 
-export default { getDevice, initLaunchpad };
+export default { getDevice, initMidiController };
 
 
 
@@ -45,17 +47,20 @@ export default { getDevice, initLaunchpad };
 // 28      Green  Low
 // 60      Green  Full 
 
-var launchpad = {};
+//var launchpad = {};
 
-function initLaunchpad() {
+function initMidiController() {
   getDevice(
     function(inp, out)  {
       inp.onmidimessage = printMidiMessage;
-      launchpad = { input: inp, output: out };
+      midicontroller = { input: inp, output: out };
     },
-    /^Launchpad/
+    /^Launch(pad| Control)/
   );
 }
+
+
+
 
 // Grid starts bottom left
 function midiNoteToGrid(note) {
@@ -65,8 +70,8 @@ function midiNoteToGrid(note) {
 }
 
 function printMidiMessage(e) {
-  var cell = midiNoteToGrid(e.data[1]);
-  launchpad.output.send([144, e.data[1], 63]);
-  setTimeout(() => { launchpad.output.send([144, e.data[1], 12]); }, 500);
-  console.log('Got MIDI:', cell);
+  // var cell = midiNoteToGrid(e.data[1]);
+  // launchpad.output.send([144, e.data[1], 63]);
+  // setTimeout(() => { launchpad.output.send([144, e.data[1], 12]); }, 500);
+  console.log('Got MIDI:', e.data);
 }
