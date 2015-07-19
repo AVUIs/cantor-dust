@@ -1,5 +1,5 @@
 {
-  "name": "finna-be-tribble",
+  "name": "cantor-dust",
   "version": "0.0.1",
   "description": "Fractal audio synthesis",
   "main": "main.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AVUIs/finna-be-tribble.git"
+    "url": "https://github.com/AVUIs/cantor-dust.git"
   },
   "author": "Louis Pilfold <louis@lpil.uk>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/AVUIs/finna-be-tribble/issues"
+    "url": "https://github.com/AVUIs/cantor-dust/issues"
   },
-  "homepage": "https://github.com/AVUIs/finna-be-tribble",
+  "homepage": "https://github.com/AVUIs/cantor-dust",
   "dependencies": {
     "babel-brunch": "^5.1.1",
     "brunch": "^1.8.1",
