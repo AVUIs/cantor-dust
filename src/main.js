@@ -7,6 +7,9 @@ window.midi = midi;
 import initLaunchpad from 'launchpad';
 window.initLaunchpad = initLaunchpad;
 
+import initLaunchControl from 'novation-launchcontrol'
+window.initLaunchControl = initLaunchControl
+
 
 import audio from 'audio';
 window.audio = audio;
