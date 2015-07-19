@@ -88,14 +88,19 @@ function load(num, frames) {
 
 	   
 		// get the average for the first channel
-		var array =  new Uint8Array(analyser.frequencyBinCount);
-		analyser.getByteFrequencyData(array);
+		// var array =  new Uint8Array(analyser.frequencyBinCount);
+		// analyser.getByteFrequencyData(array);
+
+		var array =  new Uint8Array(analyser.fftSize);
+		analyser.getByteTimeDomainData(array);
+	
+		ctx.fillStyle = "rgba(255,0,0,0.05)";
 		
 		// clear the current state
-		ctx.clearRect(0, 0, 1000, 325);
+//		ctx.clearRect(0, 0, 1000, 325);
 		
 		// set the fill style
-		ctx.fillStyle = "#FF0000";
+//		ctx.fillStyle = "#ff0000";
 		drawSpectrum(array,ctx);
 
 	    }
