@@ -3,6 +3,47 @@ Cantor Dust
 
 Fractal audio synthesis.
 
+## About
+
+In the browser we functionally generate a Cantor Set fractal. With the final
+iteration we create a wavetable and load it into a web audio
+AudioBufferSourceNode, sonifying the fractal.
+
+We have 8 buffer nodes, allowing us to play multiple fractals at once, leading
+to interesting iterations between sequences. The buffers for each node can be
+updated with new fractals while playing, so there are no gaps in the playback,
+and the buffers stay in phase.
+
+Our Cantor set algorithm is slightly more flexible than the traditional one, as
+rather than completely removing sections, we attenuate them, which means we can
+generate richer sounds. The number of segments and iterations we can have is
+unlimited, but our interfaces (both GUI and hardware) only provides control for
+up to 8 segments, and we've found that with this many it becomes too expensive
+to generate more than 15 or so iterations.
+
+For a pattern of “1, 0.5, 1” the first three iterations are like so:
+
+```
+1.0
+1.0         0.5          1.0
+1.0 0.5 1.0 0.5 0.25 0.5 1.0 0.5 1.0
+```
+
+This is all done in pure Javascript, and runs in modern web browsers. As a
+result, it's super accessable and easy to share. :)
+
+
+### Technologies
+
+* ES6 Javascript
+* Web Audio API
+* Web MIDI
+* HTML5 Canvas
+* Brunch build system
+
+And for extra fun: a Novation Launchpad and a Novation Launchcontrol XL.
+
+
 
 ## Installation
 
@@ -18,27 +59,3 @@ npm install -g brunch
 brunch watch -s
 # And then navigate to http://localhost:3333/
 ```
-
-## Theory
-
-We're going for a variation on a cantor set. Check this out:
-
-For a pattern of “1, 0.5, 1” (the default for this sketch), the first three
-iterations are:
-
-```
-1.0
-1.0         0.5          1.0
-1.0 0.5 1.0 0.5 0.25 0.5 1.0 0.5 1.0
-```
-
-And the last iteration is our wavetable. Banging.
-
-
-## References
-
-* [Exploring Audio Fractals by Terran Olson][exploring-audio-frac]
-* [jdnorthrup/fractalwavetablesketch][fractal-sketch]
-
-[exploring-audio-frac]: http://sessionville.com/articles/exploring-audio-fractals
-[fractal-sketch]: https://github.com/jdnorthrup/fractalwavetablesketch
