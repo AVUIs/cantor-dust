@@ -3,10 +3,10 @@
 var audioCtxConstructor = (window.AudioContext || window.webkitAudioContext),
     audioCtx = new audioCtxConstructor(),
     sources  = [],
+    fractal  = [0],
     i = 8;
 
 function play(i, rawData) {
-
   var source = audioCtx.createBufferSource(),
       oldSrc = sources[i],
       frames = rawData.length,
@@ -31,8 +31,22 @@ function play(i, rawData) {
   sources[i] = source;
 }
 
-window.makeNoise = function makeNoise(bufferI, pattern, iterations) {
+
+window.generate = function makeNoise(pattern, iterations) {
+  console.log('Generating fractal...');
   var worker = new Worker('worker/fractal.js');
-  worker.onmessage = function(e) { play(bufferI, e.data); };
+  worker.onmessage = function(e) {
+    fractal = e.data;
+    console.log('Wavetable ready!');
+  };
   worker.postMessage([pattern, iterations]);
+};
+
+
+// Swaps the waiting wavetable for the playing wavetable for source `i`
+// Because it swaps you can effectively undo your decision by running it again
+window.load = function load(i) {
+  var previous = sources[i].getChannelData(0);
+  play(i, fractal);
+  fractal = previous;
 };
