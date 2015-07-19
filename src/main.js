@@ -17,8 +17,19 @@ window.load     = audio.load;
 window.generate = audio.generate;
 window.controls = audio.controls;
 
-var ractive = new Ractive({
-    el: '#fracth-synth-1 .controls',
-    template: '{{controls[0].iterations}}, {{controls[0].pattern}}',
-    data: { controls }
-});
+import Cantor from 'canvas.cantor';
+window.Cantor = Cantor;
+
+
+// var synth0 = new Bind({
+//     iterations: window.controls[0]
+// }, {
+    
+// });
+
+
+// var ractive = new Ractive({
+//     el: '#fract-synth-1 .controls',
+//     template: '{{iterations}}, {{pattern}}',
+//     data: controls[0] 
+// });
