@@ -5,6 +5,7 @@ var audioCtxConstructor = (window.AudioContext || window.webkitAudioContext),
     nSamples = Math.pow(2, 19),
     sources  = [],
     buffers  = [],
+    controls = [],
     fractal  = [0],
     i = 8;
 
@@ -30,6 +31,7 @@ function generate(i, pattern, iterations) {
     console.log('Fractal generated');
     load(i, e.data);
   };
+  controls[i] = {pattern: pattern, iterations: iterations};
   worker.postMessage([pattern, iterations]);
 }
 
@@ -43,4 +45,4 @@ function load(num, frames) {
   }
 }
 
-export default { generate };
+export default { generate, controls };

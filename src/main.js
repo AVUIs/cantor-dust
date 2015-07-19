@@ -15,3 +15,10 @@ import audio from 'audio';
 window.audio = audio;
 window.load     = audio.load;
 window.generate = audio.generate;
+window.controls = audio.controls;
+
+var ractive = new Ractive({
+    el: '#fracth-synth-1 .controls',
+    template: '{{controls[0].iterations}}, {{controls[0].pattern}}',
+    data: controls 
+});
