@@ -43,7 +43,7 @@ function loadWavetables(samples, left, right) {
 }
 
 function generate(i, pattern, iterations) {
-  var worker = new Worker('worker/fractal.js');
+  var worker = new Worker('worker/cantor.js');
   worker.onmessage = function(e) {
     var config = { pattern, iterations };
     synths[i].update(config, e.data);
