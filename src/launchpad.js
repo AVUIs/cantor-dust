@@ -17,13 +17,16 @@ import midi from 'midi';
 var launchpad = {};
 
 function initLaunchpad() {
-  midi.getDevice(
-    (input, output) => {
-      input.onmidimessage = recieveMIDIMessage;
-      launchpad = { input, output };
-    },
-    /^Launchpad/
-  );
+  midi.getDevice(registerLaunchpad, /^Launchpad/);
+}
+
+function registerLaunchpad(input, output) {
+  if (input && output) {
+    input.onmidimessage = recieveMIDIMessage;
+    launchpad = { input, output };
+  } else {
+    throw 'ERROR: Launchpad MIDI device not found';
+  }
 }
 
 function isSideButton(note) {

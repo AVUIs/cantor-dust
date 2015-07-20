@@ -6,22 +6,22 @@ var numSynths = 8,
     numSamples = Math.pow(2, 19),
     synths     = Array.apply(null, { length: numSynths });
 
-class CantorSynth {
+class WavetableSynth {
   constructor() {
     var source = audioCtx.createBufferSource(),
         buffer = audioCtx.createBuffer(2, numSamples, audioCtx.sampleRate);
     this.channels = {};
     this.channels.left  = buffer.getChannelData(0);
     this.channels.right = buffer.getChannelData(1);
-    this.configData = { pattern: [0], iterations: 1 };
+    this.metadata = { pattern: [0], iterations: 1 };
     source.loop   = true;
     source.buffer = buffer;
     source.connect(audioCtx.destination);
     source.start();
   }
 
-  update(configData, wavetable) {
-    this.configData = configData;
+  update(metadata, wavetable) {
+    this.metadata   = metadata;
     this.bufferData = wavetable;
   }
 
@@ -53,6 +53,6 @@ function generate(i, pattern, iterations) {
 }
 
 
-synths = synths.map(() => new CantorSynth());
+synths = synths.map(() => new WavetableSynth());
 
 export default { generate, synths, numSamples };

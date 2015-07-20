@@ -8,10 +8,10 @@ navigator.requestMIDIAccess().then(
 );
 
 function findDevice(devices, nameRegex) {
-  var result = { done: false };
+  var result = devices.next();
   while (!result.done) {
-    result = devices.next();
     if (nameRegex.test(result.value.name)) { return result.value; }
+    result = devices.next();
   }
 }
 
