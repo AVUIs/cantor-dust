@@ -4,17 +4,15 @@ import midi from 'midi';
 window.midi = midi;
 
 
-import initLaunchpad from 'launchpad';
-window.initLaunchpad = initLaunchpad;
-
-import initLaunchControl from 'novation-launchcontrol';
+import initLaunchpad     from 'controllers/novation-launchpad';
+import initLaunchControl from 'controllers/novation-launchcontrol';
+window.initLaunchpad     = initLaunchpad;
 window.initLaunchControl = initLaunchControl;
 
 
 import audio from 'audio';
 window.audio = audio;
 window.generate = audio.generate;
-window.controls = audio.controls;
 
 import Cantor from 'canvas.cantor';
 window.Cantor = Cantor;
