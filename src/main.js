@@ -3,6 +3,9 @@
 import midi from 'midi';
 window.midi = midi;
 
+import player from 'player';
+window.play          = player.play;
+window.playDebounced = player.playDebounced;
 
 import initLaunchpad     from 'controllers/novation-launchpad';
 import initLaunchControl from 'controllers/novation-launchcontrol';
