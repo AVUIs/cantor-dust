@@ -2,7 +2,7 @@
 
 import audio from 'audio';
 
-var debouncedTimeouts = Array.apply(null, { length: audio.synths.length });
+var debouncedTimeouts = [];
 
 function play(i, pattern, iterations) {
   audio.generate(i, pattern, iterations);

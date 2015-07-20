@@ -33,16 +33,17 @@ function isSideButton(note) {
   return !(note <= 104 || note >= 111);
 }
 function isTopButton(note) {
-  return (
-    note === 8   ||
-    note === 24  ||
-    note === 40  ||
-    note === 56  ||
-    note === 72  ||
-    note === 88  ||
-    note === 104 ||
-    note === 120
-  );
+  switch (note) {
+    case   8: return true;
+    case  24: return true;
+    case  40: return true;
+    case  56: return true;
+    case  72: return true;
+    case  88: return true;
+    case 104: return true;
+    case 120: return true;
+    default:  return false;
+  }
 }
 function isGrid(note) {
   return !(isTopButton(note) || isSideButton(note));
@@ -54,9 +55,9 @@ function lightOn(note) {
 function lightOff(note) {
   launchpad.output.send([144, note, 12]);
 }
-function lightFlash(note, duration) {
+function lightFlash(note, duration = 500) {
   lightOn(note);
-  setTimeout(() => { lightOff(note); }, duration || 500);
+  setTimeout(() => { lightOff(note); }, duration);
 }
 function lightColumn(col, num) {
   var colOffset = gridToMidiNote(col, 0),
