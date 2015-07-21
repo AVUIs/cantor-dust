@@ -2,20 +2,11 @@
 
 exports.config = {
   files: {
-    javascripts: {
-      joinTo: 'main.js',
-    },
-    stylesheets: {
-      joinTo: 'main.css',
-    },
-    templates: {
-      joinTo: 'templates.js',
-    }
+    javascripts: { joinTo: 'main.js', },
+    stylesheets: { joinTo: 'main.css', },
   },
 
-  npm: {
-    enabled: true
-  },
+  npm: { enabled: true },
 
   plugins: {
     babel: {
