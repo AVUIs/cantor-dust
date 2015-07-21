@@ -14,10 +14,21 @@ class WavetableSynth {
     this.channels.left  = buffer.getChannelData(0);
     this.channels.right = buffer.getChannelData(1);
     this.metadata = { pattern: [0], iterations: 1 };
+    this.worker = { terminate: () => {} };
     source.loop   = true;
     source.buffer = buffer;
     source.connect(audioCtx.destination);
     source.start();
+  }
+
+  play(pattern, iterations) {
+    this.worker.terminate();
+    this.worker = new Worker('worker/cantor.js');
+    this.worker.onmessage = (e) => {
+      this.update({ pattern, iterations }, e.data);
+      console.log('Fractal generated');
+    };
+    this.worker.postMessage([pattern, iterations]);
   }
 
   update(metadata, wavetable) {
@@ -42,17 +53,6 @@ function loadWavetables(samples, left, right) {
   }
 }
 
-function generate(i, pattern, iterations) {
-  var worker = new Worker('worker/cantor.js');
-  worker.onmessage = function(e) {
-    var config = { pattern, iterations };
-    synths[i].update(config, e.data);
-    console.log('Fractal generated');
-  };
-  worker.postMessage([pattern, iterations]);
-}
-
-
 synths = synths.map(() => new WavetableSynth());
 
-export default { generate, synths, numSamples };
+export default { synths, numSamples };
