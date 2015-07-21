@@ -24,13 +24,14 @@ function registerLaunchpad(input, output) {
   if (input && output) {
     input.onmidimessage = recieveMIDIMessage;
     launchpad = { input, output };
+    lightGridOff();
   } else {
     throw 'ERROR: Launchpad MIDI device not found';
   }
 }
 
 function isSideButton(note) {
-  return !(note <= 104 || note >= 111);
+  return !(note <= 104 || note > 111);
 }
 function isTopButton(note) {
   switch (note) {
@@ -70,6 +71,11 @@ function lightColumnOff(col) {
       i = 8;
   while (i--) { lightOff(colOffset + i); }
 }
+function lightGridOff() {
+  var col = 7;
+  while (col--) { lightColumnOff(col); }
+}
+
 
 
 // Grid starts bottom left
@@ -85,8 +91,7 @@ function gridToMidiNote(x, y) {
 
 function recieveMIDIMessage(e) {
   var note = e.data[1],
-      x,
-      y;
+      x, y;
   if (isGrid(note)) {
     [x, y] = midiNoteToGrid(note);
     lightColumn(x, y);
