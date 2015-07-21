@@ -25,21 +25,23 @@ function flash(lp, note, duration = 500) {
   setTimeout(() => { off(lp, note); }, duration);
 }
 
-function columnOn(lp, col, num) {
-  var colOffset = grid.toNote(col, 0),
-      i = num + 1;
-  columnOff(lp, col);
-  while (i--) { on(lp, colOffset + i); }
-}
 function columnOff(lp, col) {
   var colOffset = grid.toNote(col, 0),
       i = 8;
   while (i--) { off(lp, colOffset + i); }
 }
 
+function columnOn(lp, col, num) {
+  var colOffset = grid.toNote(col, 0),
+      i = num + 1;
+  columnOff(lp, col);
+  while (i--) { on(lp, colOffset + i); }
+}
+
 function gridOff(lp) {
   var col = 8;
   while (col--) { columnOff(lp, col); }
 }
+
 
 export default { on, off, flash, columnOn, columnOff, gridOff };

@@ -5,17 +5,7 @@ function isSideButton(note) {
 }
 
 function isTopButton(note) {
-  switch (note) {
-    case   8: return true;
-    case  24: return true;
-    case  40: return true;
-    case  56: return true;
-    case  72: return true;
-    case  88: return true;
-    case 104: return true;
-    case 120: return true;
-    default:  return false;
-  }
+  return [8, 24, 40, 56, 72, 88, 104, 120].includes(note);
 }
 
 function isGrid(note) {

@@ -5,6 +5,10 @@ import midi from 'midi';
 
 var launchControl = {};
 
+function printMidiMessage(e) {
+  console.log('Got MIDI:', e.data);
+}
+
 function initLaunchControl() {
   midi.getDevice(
     function(inp, out)  {
@@ -13,11 +17,6 @@ function initLaunchControl() {
     },
     /^Launch Control/
   );
-}
-
-
-function printMidiMessage(e) {
-  console.log('Got MIDI:', e.data);
 }
 
 export default initLaunchControl;

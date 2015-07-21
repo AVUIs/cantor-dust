@@ -1,14 +1,37 @@
 {
-  "globalstrict": true,
+  "globalstrict"  : true,
+  "bitwise"       : true,
+  "camelcase"     : true,
+  "curly"         : true,
+  "eqeqeq"        : true,
+  "forin"         : true,
+  "freeze"        : true,
+  "immed"         : true,
+  "indent"        : 2,
+  "latedef"       : true,
+  "newcap"        : true,
+  "noarg"         : true,
+  "noempty"       : true,
+  "nonbsp"        : true,
+  "nonew"         : false,
+  "plusplus"      : false,
+  "quotmark"      : "single",
+  "undef"         : true,
+  "unused"        : "strict",
+  "maxparams"     : 4,
+  "maxdepth"      : 3,
+  "maxstatements" : 10,
+  "maxcomplexity" : 8,
+  "maxlen"        : 80,
 
-  "esnext": true,
-  "browser": true,
-  "devel": true,
+  // Environments
+  "esnext"  : true,
+  "browser" : true,
+  "devel"   : true,
+  "worker"  : true,
 
   "globals": {
-    "exports": true,
-    "require": true,
-    "postMessage": true,
-    "onmessage": true
+    "exports"   : true,
+    "onmessage" : true
   }
 }

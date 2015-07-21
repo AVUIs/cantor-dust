@@ -1,17 +1,20 @@
 'use strict';
 
 import midiAccess from 'midi';
-import player     from 'player';
 import lights     from 'controllers/launchpad/lights';
 import grid       from 'controllers/launchpad/grid';
-import note       from 'controllers/launchpad/note';
 
 // Use the launchpad rotated 90 degrees anticlockwise
 
 var lp = {};
 
-function initLaunchpad() {
-  midiAccess.getDevice(registerLaunchpad, /^Launchpad/);
+function recieveMIDIMessage(e) {
+  var msg  = e.data,
+      note = msg[1];
+  if (note.isOnMessage(msg) && note.isGrid(note)) {
+    var [x, y] = grid.fromNote(note);
+    lights.columnOn(lp, x, y);
+  }
 }
 
 function registerLaunchpad(input, output) {
@@ -24,15 +27,8 @@ function registerLaunchpad(input, output) {
   }
 }
 
-
-function recieveMIDIMessage(e) {
-  var msg  = e.data,
-      note = msg[1],
-      x, y;
-  if (note.isOnMessage(msg) && note.isGrid(note)) {
-    [x, y] = grid.fromNote(note);
-    lights.columnOn(lp, x, y);
-  }
+function initLaunchpad() {
+  midiAccess.getDevice(registerLaunchpad, /^Launchpad/);
 }
 
 export default initLaunchpad;

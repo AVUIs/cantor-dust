@@ -3,8 +3,8 @@
 var midiAccess;
 
 navigator.requestMIDIAccess().then(
-  e => { midiAccess = e; },
-  _ => { console.log('Failed to get midi access.'); }
+  (e) => { midiAccess = e; },
+  ( ) => { console.log('Failed to get midi access.'); }
 );
 
 function findDevice(devices, nameRegex) {

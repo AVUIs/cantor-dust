@@ -6,6 +6,16 @@ var numSynths = 8,
     numSamples = Math.pow(2, 19),
     synths     = Array.apply(null, { length: numSynths });
 
+
+function loadWavetables(samples, left, right) {
+  var numFrames = samples.length,
+      len, i;
+  for (i = 0, len = left.length; i < len; i++) {
+    left[i]  = samples[i % numFrames];
+    right[i] = samples[i % numFrames];
+  }
+}
+
 class WavetableSynth {
   constructor() {
     var source = audioCtx.createBufferSource(),
@@ -41,15 +51,6 @@ class WavetableSynth {
   }
   get bufferData() {
     return [this.channels.left, this.channels.right];
-  }
-}
-
-function loadWavetables(samples, left, right) {
-  var numFrames = samples.length,
-      len, i;
-  for (i = 0, len = left.length; i < len; i++) {
-    left[i]  = samples[i % numFrames];
-    right[i] = samples[i % numFrames];
   }
 }
 
