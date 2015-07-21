@@ -1,5 +1,6 @@
+npm-debug*
 node_modules
-dist
+public
 !dist/index.html
 .tern-port
 **/.tern-port

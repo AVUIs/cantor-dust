@@ -1,1 +1,1 @@
-set wildignore+=*/dist/*
+set wildignore+=*/public/*
