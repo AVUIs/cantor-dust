@@ -6,7 +6,7 @@ window.play          = player.play;
 window.playDebounced = player.playDebounced;
 
 
-import initLaunchpad     from 'controllers/novation-launchpad';
+import initLaunchpad     from 'controllers/launchpad';
 import initLaunchControl from 'controllers/novation-launchcontrol';
 window.initLaunchpad     = initLaunchpad;
 window.initLaunchControl = initLaunchControl;
