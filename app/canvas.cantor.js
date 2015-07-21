@@ -1,99 +1,100 @@
-// http://andrew-hoyer.com/experiments/fractals/source/cantor.js 
+// http://andrew-hoyer.com/experiments/fractals/source/cantor.js
 
 'use strict';
 
 class Cantor {
-    constructor(canvas_id,standalone) {
-	// initialize the tree.
-	this.canvas = new Canvas(this,canvas_id);
-	this.ctx = this.canvas.ctx;
-	this.fillStyle = "black";
-	
-	this.max_order = 7;
-	
-	this.order_colors = Gradient("#258dc9","#043342",this.max_order);
-	
-	this.min_gap = 0.03;
-	this.max_gap = 0.5;
-	this.gap = 0.3;
-	this.min_width = 0.15;
-	this.left_width = this.right_width = (1-this.gap)/2;
-	
-	this.base_width = this.canvas.width*0.8;
-	this.base_offset = (this.canvas.width - this.base_width)/2;
-	this.base_height = this.canvas.height - (2*this.base_offset);
-	
-	this.bar_height = (2*this.base_height)/((3*this.max_order)-1);
-	this.bar_offset = this.bar_height + (0.5*this.bar_height);
-	
-	// actually initialize the canvas
-	this.draw();
-	if(!standalone) 
-	    this.canvas.blur();
+  constructor(canvasID,standalone) {
+    // initialize the tree.
+    this.canvas = new Canvas(this,canvasID);
+    this.ctx = this.canvas.ctx;
+    this.fillStyle = 'black';
+
+    this.maxOrder = 7;
+
+    this.orderColours = Gradient('#258dc9', '#043342', this.maxOrder);
+
+    this.minGap = 0.03;
+    this.maxGap = 0.5;
+    this.gap = 0.3;
+    this.minWidth = 0.15;
+    this.leftWidth = this.rightWidth = (1-this.gap)/2;
+
+    this.baseWidth = this.canvas.width*0.8;
+    this.baseOffset = (this.canvas.width - this.baseWidth)/2;
+    this.baseHeight = this.canvas.height - (2*this.baseOffset);
+
+    this.barHeight = (2*this.baseHeight)/((3*this.maxOrder)-1);
+    this.barOffset = this.barHeight + (0.5*this.barHeight);
+
+    // actually initialize the canvas
+    this.draw();
+    if (!standalone) {
+      this.canvas.blur();
     }
-    
-    update(pos) {
-		this.canvas.clear();
-		this.updateGap(pos);
-		this.draw();
+  }
+
+  update(pos) {
+    this.canvas.clear();
+    this.updateGap(pos);
+    this.draw();
+  }
+
+  updateGap(pos) {
+    var x,y,halfGap;
+
+    y = Math.max(0,  Math.min(1,(pos.y-this.baseOffset)/(this.baseHeight))  );
+    this.gap = ((this.maxGap-this.minGap)*y) + this.minGap;
+
+    halfGap = this.gap/2;
+
+    x = Math.max(0,Math.min(1,(pos.x-this.baseOffset)/(this.baseWidth)));
+
+    if(pos.x < this.canvas.halfWidth){
+      // we're on the left side.
+      this.leftWidth = Math.max(this.minWidth,x-halfGap);
+      this.rightWidth = 1-this.gap-this.leftWidth;
+    }else{
+      // we're on the right side.
+      this.rightWidth = 1-Math.min(1-this.minWidth,x+halfGap);
+      this.leftWidth = 1-this.gap-this.rightWidth;
+    }
+  }
+
+  draw() {
+    this.ctx.save();
+    // draw the base bar
+    this.ctx.fillStyle = this.orderColours[0];
+    this.ctx.translate(this.baseOffset,this.baseOffset);
+    this.ctx.fillRect(0,0,this.baseWidth,this.barHeight);
+    //			this.drawBars(this.baseWidth,1);
+    this.ctx.restore();
+
+  }
+
+  drawBars(prevWidth, order){
+    var leftWidth = this.leftWidth*prevWidth,
+      midWidth = this.gap*prevWidth,
+      rightWidth = this.rightWidth*prevWidth;
+
+    if(order >= this.maxOrder ){
+      return;
     }
 
-    updateGap(pos) {
-		var x,y,half_gap;
-		
-		y = Math.max(0,  Math.min(1,(pos.y-this.base_offset)/(this.base_height))  );
-		this.gap = ((this.max_gap-this.min_gap)*y) + this.min_gap;
-		
-		half_gap = this.gap/2;
-		
-		x = Math.max(0,Math.min(1,(pos.x-this.base_offset)/(this.base_width)));
-		
-		if(pos.x < this.canvas.half_width){
-			// we're on the left side.
-			this.left_width = Math.max(this.min_width,x-half_gap);
-			this.right_width = 1-this.gap-this.left_width;
-		}else{
-			// we're on the right side.
-			this.right_width = 1-Math.min(1-this.min_width,x+half_gap);
-			this.left_width = 1-this.gap-this.right_width;
-		}
-    }
-    
-    draw() {
-		this.ctx.save();
-			// draw the base bar
-			this.ctx.fillStyle = this.order_colors[0];
-			this.ctx.translate(this.base_offset,this.base_offset);
-			this.ctx.fillRect(0,0,this.base_width,this.bar_height);
-//			this.drawBars(this.base_width,1);
-		this.ctx.restore();
-		
-    }
-    
-    drawBars(prev_width, order){
-		var left_width = this.left_width*prev_width,
-			mid_width = this.gap*prev_width,
-			right_width = this.right_width*prev_width;
-			
-		if(order >= this.max_order ){
-			return;
-		}
-		
-		this.ctx.fillStyle = this.order_colors[order];
-		// draw the left
-		this.ctx.save();
-			this.ctx.translate(0,this.bar_offset);
-			this.ctx.fillRect(0,0,left_width,this.bar_height);
-			this.drawBars(left_width,order+1);
-		this.ctx.restore();
-		
-		// draw the right
-		this.ctx.save();
-			this.ctx.translate(left_width+mid_width,this.bar_offset);
-			this.ctx.fillRect(0,0,right_width,this.bar_height);
-			this.drawBars(right_width,order+1);
-		this.ctx.restore();
-	}
-};
+    this.ctx.fillStyle = this.orderColours[order];
+    // draw the left
+    this.ctx.save();
+    this.ctx.translate(0,this.barOffset);
+    this.ctx.fillRect(0,0,leftWidth,this.barHeight);
+    this.drawBars(leftWidth,order+1);
+    this.ctx.restore();
+
+    // draw the right
+    this.ctx.save();
+    this.ctx.translate(leftWidth+midWidth,this.barOffset);
+    this.ctx.fillRect(0,0,rightWidth,this.barHeight);
+    this.drawBars(rightWidth,order+1);
+    this.ctx.restore();
+  }
+}
 
 export default Cantor ;
