@@ -32,10 +32,12 @@ class WavetableSynth {
   }
 
   play(pattern, iterations) {
+    var cantor;
     this.worker.terminate();
     this.worker = new Worker('worker/cantor.js');
     this.worker.onmessage = (e) => {
-      this.update({ pattern, iterations }, e.data);
+      cantor = e.data[e.data.length - 1];
+      this.update({ pattern, iterations }, cantor);
       console.log('Fractal generated');
     };
     this.worker.postMessage([pattern, iterations]);

@@ -14,19 +14,20 @@ function vecMult(xs, ys) {
   }, []);
 }
 
-function cantor(pattern, iterations, maxLength) {
-  var arr = [1],
+function cantor(pat, iterations) {
+  var results = [],
+      arr     = [1],
+      maxLen  = Math.pow(2, 19),
       maxSeedLen;
-  pattern    = pattern || [1, 0.5, 1];
   iterations = iterations || 10;
-  maxLength  = maxLength || Math.pow(2, 19);
-  maxSeedLen = Math.ceil(maxLength / pattern.length);
+  maxSeedLen = Math.ceil(maxLen / pat.length);
 
   while (iterations--) {
     arr = arr.slice(0, maxSeedLen);
-    arr = vecMult(pattern, arr);
+    arr = vecMult(pat, arr);
+    results.push(arr.slice(0, maxLen));
   }
-  return arr;
+  return results;
 }
 
 onmessage = function(args) {
