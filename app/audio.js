@@ -14,6 +14,7 @@ class WavetableSynth {
     this.channels = {};
     this.channels.left  = buffer.getChannelData(0);
     this.channels.right = buffer.getChannelData(1);
+    source.playbackRate.value = 0.3;
     source.loop   = true;
     source.buffer = buffer;
     source.connect(audioCtx.destination);
