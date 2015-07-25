@@ -4,69 +4,30 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>Cantor Dust</title>
+
+    <style type="text/css" media="screen">
+body {
+  margin: 0;
+  background: black;
+}
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+canvas.bottom {
+  background: black;
+  z-index: 10;
+}
+canvas.top {
+  opacity: 0.5;
+  z-index: 11;
+}
+    </style>
   </head>
   <body>
-    <h1>Cantor Dust</h1>
-
-
-    <!-- HACK HACK HACK -->
-    <div id="fract-synth-0">
-      <div class="display">
-	<canvas id="c0" width="600" height="125"></canvas>
-      </div>
-      <div class="controls">
-      </div>
-
-    <div id="fract-synth-1">
-      <div class="display">
-	<canvas id="c1" width="600" height="125"></canvas>
-      </div>
-      <div class="controls">
-      </div>
-    </div>
-       <div id="fract-synth-2">
-      <div class="display">
-	<canvas id="c2" width="600" height="125"></canvas>
-      </div>
-      <div class="controls">
-      </div>
-    </div>
-    <div id="fract-synth-3">
-      <div class="display">
-	<canvas id="c3" width="600" height="125"></canvas>
-      </div>
-      <div class="controls">
-      </div>
-    </div>
-    <div id="fract-synth-4">
-      <div class="display">
-	<canvas id="c4" width="600" height="125"></canvas>
-      </div>
-      <div class="controls">
-      </div>
-    </div>
-    <div id="fract-synth-5">
-      <div class="display">
-	<canvas id="c5" width="600" height="125"></canvas>
-      </div>
-      <div class="controls">
-      </div>
-    </div>
-    <div id="fract-synth-6">
-      <div class="display">
-	<canvas id="c6" width="600" height="125"></canvas>
-      </div>
-      <div class="controls">
-      </div>
-    </div>
-    <div id="fract-synth-7">
-      <div class="display">
-	<canvas id="c7" width="600" height="125"></canvas>
-      </div>
-      <div class="controls">
-      </div>
-    </div>
-
+    <canvas class="bottom"></canvas>
+    <canvas class="top"></canvas>
 
     <script src="main.js" type="text/javascript" charset="utf-8"></script>
     <script src="vendor.js" type="text/javascript" charset="utf-8"></script>
