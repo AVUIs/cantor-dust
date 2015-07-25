@@ -26,4 +26,17 @@ function getDevice(cb, nameRegex) {
   cb(input, output);
 }
 
-export default { getDevice };
+// Returns an array of names of available midi inputs
+//
+function availableDevices() {
+  var inputs = midiAccess.inputs.values(),
+      result = inputs.next(),
+      names  = [];
+  while (!result.done) {
+    names.push(result.value.name);
+    result = inputs.next();
+  }
+  return names;
+}
+
+export default { getDevice, availableDevices };

@@ -44,7 +44,6 @@ result, it's super accessable and easy to share. :)
 And for extra fun: a Novation Launchpad and a Novation Launchcontrol XL.
 
 
-
 ## Installation
 
 First, install [node.js](https://nodejs.org/). If you're on OSX and use brew
