@@ -7,7 +7,6 @@ var numSynths = 8,
     synths     = Array.apply(null, { length: numSynths });
 
 
-
 class WavetableSynth {
   constructor() {
     var source = audioCtx.createBufferSource(),

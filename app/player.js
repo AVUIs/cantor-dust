@@ -1,32 +1,37 @@
 'use strict';
 
 import audio from 'audio';
+import gui   from 'gui';
+import state from 'state';
 
 var debouncedTimeouts = [],
     workers = [];
 
-function terminate(i) {
+function update(i, data) {
+  var cantor = data.cantor;
+  cantor = cantor[cantor.length - 1];
+  state.save(i, data);
+  audio.synths[i].wavetable = cantor;
+  gui.update({ cantor: 1 });
+}
+
+function resetWorker(i, cb) {
   if (workers[i] && workers[i].terminate) {
     workers[i].terminate();
   }
-}
-
-function update(i, data) {
-  var cantor = data[data.length - 1];
-  audio.synths[i].wavetable = cantor;
-}
-
-function resetWorker(i) {
-  terminate(i);
   workers[i] = new Worker('worker/cantor.js');
-  workers[i].onmessage = (e) => {
-    update(i, e.data);
-    console.log('Fractal generated');
-  };
+  workers[i].onmessage = cb;
 }
 
 function play(i, pattern, iterations) {
-  resetWorker(i);
+  var cb,
+      data = { pattern, iterations };
+  cb = function(e) {
+    data.cantor = e.data;
+    update(i, data);
+    console.log('Fractal generated');
+  };
+  resetWorker(i, cb);
   workers[i].postMessage([pattern, iterations]);
 }
 
