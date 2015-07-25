@@ -4,7 +4,7 @@ function plotIteration(ctx, iteration, dimensions) {
   var i = iteration.length,
       segmentW = dimensions.w / i,
       c, y;
-  if (segmentW < 0.3) { return; }
+  if (segmentW < 0.1) { return; }
   while (i--) {
     c = Math.round(255 * iteration[i]);
     y = dimensions.y;
@@ -14,7 +14,7 @@ function plotIteration(ctx, iteration, dimensions) {
 }
 
 function plot(ctx, cantor, dimensions) {
-  var i = cantor.length,
+  var i = Math.min(cantor.length, 8),
       h = dimensions.h,
       dim;
   dimensions.h = h / i;
