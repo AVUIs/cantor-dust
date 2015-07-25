@@ -1,13 +1,19 @@
 'use strict';
 
+import cantor from 'gui/cantor';
+
 var botCanvas = document.querySelector('canvas.bottom'),
     topCanvas = document.querySelector('canvas.top'),
     botCtx = botCanvas.getContext('2d'),
     topCtx = topCanvas.getContext('2d');
 
+window.ctx = topCtx;
 
-function update() {
-  console.log('Updating GUI');
+function update(updated, cantorArr) {
+  var segmentH = window.innerHeight / 8,
+      i   = updated.cantor,
+      dim = { x: 0, y: i * segmentH, w: window.innerWidth, h: segmentH };
+  cantor.plot(botCtx, cantorArr, dim);
 }
 
 function resizeCanvas() {
@@ -19,12 +25,5 @@ function resizeCanvas() {
 
 window.onresize = resizeCanvas;
 resizeCanvas();
-
-setTimeout(function() {
-  botCtx.fillStyle = '#fff';
-  botCtx.fillRect(30, 15, 150, 100);
-  topCtx.fillStyle = 'hotpink';
-  topCtx.fillRect(50, 25, 150, 100);
-}, 200);
 
 export default { update };

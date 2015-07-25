@@ -8,11 +8,11 @@ var debouncedTimeouts = [],
     workers = [];
 
 function update(i, data) {
-  var cantor = data.cantor;
-  cantor = cantor[cantor.length - 1];
+  var cantor    = data.cantor,
+      wavetable = cantor[cantor.length - 1];
   state.save(i, data);
-  audio.synths[i].wavetable = cantor;
-  gui.update({ cantor: 1 });
+  audio.synths[i].wavetable = wavetable;
+  gui.update({ cantor: i }, cantor);
 }
 
 function resetWorker(i, cb) {

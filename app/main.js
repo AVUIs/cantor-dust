@@ -12,8 +12,5 @@ window.initLaunchpad     = initLaunchpad;
 window.initLaunchControl = initLaunchControl;
 
 
-import Cantor from 'canvas.cantor';
-window.Cantor = Cantor;
-
 import { availableDevices } from 'midi';
 window.availableDevices = availableDevices;
