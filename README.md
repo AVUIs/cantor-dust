@@ -47,6 +47,9 @@ And for extra fun: a Novation Launchpad and a Novation Launchcontrol XL.
 
 ## Installation
 
+First, install [node.js](https://nodejs.org/). If you're on OSX and use brew
+you can install with `brew install node`.
+
 ```sh
 npm install
 npm install -g brunch
