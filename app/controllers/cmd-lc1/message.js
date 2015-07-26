@@ -26,6 +26,7 @@ function fromNumberOn(msg) {
   return msg[1] - 16;
 }
 
+
 function isRecOn(msg) {
   var y = msg[1];
   return isOn(msg) && y >= 72 && y <= 75;
@@ -35,8 +36,23 @@ function fromRecOn(msg) {
   return msg[1] - 16;
 }
 
+
+function isGridOn(msg) {
+  var y = msg[1];
+  return isOn(msg) && y >= 32 && y <= 63;
+}
+
+function fromGrid(msg) {
+  var a = msg[1],
+      x = a % 4,
+      y = Math.abs(Math.floor(a / 4) - 15);
+  return [x, y];
+}
+
+
 export default {
   isEncoder,  fromEncoder,
   isNumberOn, fromNumberOn,
   isRecOn,    fromRecOn,
+  isGridOn,   fromGrid,
 };

@@ -34,9 +34,9 @@ function adjustPattern(msg) {
   player.playDebounced(focused, ctr.pattern, ctr.iterations, 200);
 }
 
-function adjustIterations(change) {
-  var s   = state.load(focused),
-      itr = s.iterations + change;
+function setIterations(itr) {
+  console.log(itr);
+  var s   = state.load(focused);
   s.iterations = itr;
   state.save(focused, s);
   controls[focused].iterations = itr;
@@ -44,4 +44,4 @@ function adjustIterations(change) {
 }
 
 
-export default { init, setFocus, adjustPattern, adjustIterations };
+export default { init, setFocus, adjustPattern, setIterations };
