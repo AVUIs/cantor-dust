@@ -1,7 +1,11 @@
 Cantor Dust
 ===========
 
-Fractal audio synthesis.
+Cantor Dust is an audio visual instrument that generates, displays, and
+sonifies cantor set like fractals. It allows to the user to control the
+starting seed and number of iterations for a number of fractals at once, either
+through the graphical interface, or through an midi controller. The project is
+written in plain old Javascript, and runs entirely in a (modern) web browser.
 
 ## About
 
