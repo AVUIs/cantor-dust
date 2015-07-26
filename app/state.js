@@ -7,7 +7,7 @@ function save(i, data) {
 }
 
 function load(i) {
-  return state[i] || { iterations: 8 };
+  return state[i] || { iterations: 8, pattern: [0,0,0,0] };
 }
 
 export default { save, load };

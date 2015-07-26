@@ -4,7 +4,6 @@ function plotIteration(ctx, iteration, dimensions) {
   var i = iteration.length,
       segmentW = dimensions.w / i,
       c, y;
-  if (segmentW < 0.1) { return; }
   while (i--) {
     c = Math.round(255 * iteration[i]);
     y = dimensions.y;

@@ -6,7 +6,12 @@ import gui    from 'gui';
 
 var focused  = 0,
     stepSize = 0.02,
-    controls = Array.apply(null, { length: 8 });
+    controls = [];
+
+function init() {
+  var i = 8;
+  while (i--) { controls[i] = state.load(i); }
+}
 
 function setFocus(i) {
   console.log(`Focused ${i}`);
@@ -38,10 +43,5 @@ function adjustIterations(change) {
   gui.updateIterations(focused, itr);
 }
 
-window.foo = adjustIterations;
 
-controls = controls.map(function() {
-  return { iterations: 8, pattern: [0, 0, 0, 0] };
-});
-
-export default { setFocus, adjustPattern, adjustIterations };
+export default { init, setFocus, adjustPattern, adjustIterations };

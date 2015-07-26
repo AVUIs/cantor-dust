@@ -26,6 +26,7 @@ function registerCMDLC1(input, output) {
 
 function initCMDLC1() {
   midiAccess.getDevice(registerCMDLC1, /^CMD LC-1$/);
+  controls.init();
 }
 
 export default initCMDLC1;
