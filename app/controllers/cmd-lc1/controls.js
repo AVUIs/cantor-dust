@@ -1,6 +1,8 @@
 'use strict';
 
 import player from 'player';
+import state  from 'state';
+import gui    from 'gui';
 
 var focused  = 0,
     stepSize = 0.02,
@@ -27,9 +29,19 @@ function adjustPattern(msg) {
   player.playDebounced(focused, ctr.pattern, ctr.iterations, 200);
 }
 
+function adjustIterations(change) {
+  var s   = state.load(focused),
+      itr = s.iterations + change;
+  s.iterations = itr;
+  state.save(focused, s);
+  controls[focused].iterations = itr;
+  gui.updateIterations(focused, itr);
+}
+
+window.foo = adjustIterations;
 
 controls = controls.map(function() {
   return { iterations: 8, pattern: [0, 0, 0, 0] };
 });
 
-export default { setFocus, adjustPattern };
+export default { setFocus, adjustPattern, adjustIterations };

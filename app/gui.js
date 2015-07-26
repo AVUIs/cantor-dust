@@ -18,8 +18,7 @@ function updateCantor(i, cantorArr) {
 function updateIterations(i, iterations) {
   var y = i * segmentH + 5,
       x = window.innerWidth - 5;
-  ctx.fillStyle = 'black';
-  ctx.fillRect(44, 44, x - 44, y - 44);
+  ctx.clearRect(x - 30, y, 30, 22);
   ctx.textBaseline = 'hanging';
   ctx.textAlign    = 'right';
   ctx.fillStyle    = 'grey';
