@@ -12,4 +12,14 @@ function fromEncoder(msg) {
   return { encoder, change };
 }
 
-export default { isEncoder, fromEncoder };
+
+function isNumberOn(msg) {
+  var [x, y, z] = msg;
+  return x === 144 && z === 127 && y >= 16 && y <= 23;
+}
+
+function fromNumberOn(msg) {
+  return msg[1] - 16;
+}
+
+export default { isEncoder, fromEncoder, isNumberOn, fromNumberOn };

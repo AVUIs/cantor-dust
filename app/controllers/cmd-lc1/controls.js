@@ -7,6 +7,7 @@ var focused  = 0,
     controls = Array.apply(null, { length: 8 });
 
 function setFocus(i) {
+  console.log(`Focused ${i}`);
   focused = i;
 }
 

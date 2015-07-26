@@ -10,6 +10,8 @@ function recieveMIDIMessage(e) {
   var msg = e.data;
   if (message.isEncoder(msg)) {
     controls.adjustPattern(message.fromEncoder(msg));
+  } else if (message.isNumberOn(msg)) {
+    controls.setFocus(message.fromNumberOn(msg));
   }
 }
 
