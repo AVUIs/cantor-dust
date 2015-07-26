@@ -27,14 +27,9 @@ function adjustPattern(msg) {
   player.playDebounced(focused, ctr.pattern, ctr.iterations, 200);
 }
 
-function apply() {
-  var ctr = controls[focused];
-  player.play(focused, ctr.pattern, ctr.iterations);
-}
-
 
 controls = controls.map(function() {
   return { iterations: 8, pattern: [0, 0, 0, 0] };
 });
 
-export default { setFocus, adjustPattern, apply };
+export default { setFocus, adjustPattern };

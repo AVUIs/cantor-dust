@@ -7,7 +7,7 @@ function save(i, data) {
 }
 
 function load(i) {
-  return state[i] || {};
+  return state[i] || { iterations: 8 };
 }
 
 export default { save, load };

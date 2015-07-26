@@ -12,6 +12,7 @@ function updateSynthAndGUI(i, data) {
       wavetable = cantor[cantor.length - 1];
   state.save(i, data);
   audio.synths[i].wavetable = wavetable;
+  gui.updateIterations(i, data.iterations);
   gui.updateCantor(i, cantor);
 }
 
