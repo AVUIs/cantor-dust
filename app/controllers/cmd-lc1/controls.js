@@ -15,7 +15,8 @@ function setFocus(i) {
 // and increments or decrements the matching pattern segment
 //
 function adjustPattern(msg) {
-  var pattern = controls[focused].pattern,
+  var ctr = controls[focused],
+      pattern = ctr.pattern,
       val;
   if (pattern[msg.encoder] !== undefined) {
     val = pattern[msg.encoder] + stepSize * msg.change;
@@ -23,7 +24,7 @@ function adjustPattern(msg) {
     val = Math.max(0, val);
     pattern[msg.encoder] = val;
   }
-  console.log(pattern);
+  player.playDebounced(focused, ctr.pattern, ctr.iterations, 200);
 }
 
 function apply() {

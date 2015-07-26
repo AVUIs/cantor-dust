@@ -1,5 +1,9 @@
 'use strict';
 
+function isOn(msg) {
+  return msg[0] === 144 && msg[2] === 127;
+}
+
 function isEncoder(msg) {
   var x = msg[0],
       y = msg[1];
@@ -14,12 +18,25 @@ function fromEncoder(msg) {
 
 
 function isNumberOn(msg) {
-  var [x, y, z] = msg;
-  return x === 144 && z === 127 && y >= 16 && y <= 23;
+  var y = msg[1];
+  return isOn(msg) && y >= 16 && y <= 23;
 }
 
 function fromNumberOn(msg) {
   return msg[1] - 16;
 }
 
-export default { isEncoder, fromEncoder, isNumberOn, fromNumberOn };
+function isRecOn(msg) {
+  var y = msg[1];
+  return isOn(msg) && y >= 72 && y <= 75;
+}
+
+function fromRecOn(msg) {
+  return msg[1] - 16;
+}
+
+export default {
+  isEncoder,  fromEncoder,
+  isNumberOn, fromNumberOn,
+  isRecOn,    fromRecOn,
+};
