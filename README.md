@@ -65,3 +65,12 @@ npm install -g brunch
 brunch watch -s
 # And then navigate to http://localhost:3333/
 ```
+
+## LICENCE
+
+```
+Copyright © 2015 Louis Pilfold and Berkan Eskikaya. All Rights Reserved.
+```
+
+Licence yet to be decided upon. If you are interested in using or working on
+this project, please open an issue requesting that we pick a licence. :)
