@@ -10,12 +10,14 @@ function recieveMIDIMessage(e) {
   var x, y, a, msg = e.data;
   if (message.isEncoder(msg)) {
     controls.adjustPattern(message.fromEncoder(msg));
+
   } else if (message.isNumberOn(msg)) {
     controls.setFocus(message.fromNumberOn(msg));
+
   } else if (message.isGridOn(msg)) {
     [x, y] = message.fromGrid(msg);
     a = (x * 8) + (y + 1);
-    controls.setIterations(Math.min(a, 16));
+    controls.setIterations(lc, Math.min(a, 16), msg[1]);
   }
 }
 

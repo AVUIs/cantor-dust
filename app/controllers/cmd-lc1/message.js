@@ -42,6 +42,11 @@ function isGridOn(msg) {
   return isOn(msg) && y >= 32 && y <= 63;
 }
 
+
+function gridNoteFromXY([x, y]) {
+  y = Math.abs((y - 15) * 4);
+  return y + x;
+}
 function fromGrid(msg) {
   var a = msg[1],
       x = a % 4,
@@ -51,8 +56,9 @@ function fromGrid(msg) {
 
 
 export default {
-  isEncoder,  fromEncoder,
-  isNumberOn, fromNumberOn,
-  isRecOn,    fromRecOn,
-  isGridOn,   fromGrid,
+  isEncoder,      fromEncoder,
+  isNumberOn,     fromNumberOn,
+  isRecOn,        fromRecOn,
+  isGridOn,       fromGrid,
+  gridNoteFromXY,
 };

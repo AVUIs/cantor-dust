@@ -3,6 +3,7 @@
 import player from 'player';
 import state  from 'state';
 import gui    from 'gui';
+import lights from 'controllers/cmd-lc1/lights';
 
 var focused  = 0,
     stepSize = 0.02,
@@ -34,13 +35,13 @@ function adjustPattern(msg) {
   player.playDebounced(focused, ctr.pattern, ctr.iterations, 200);
 }
 
-function setIterations(itr) {
-  console.log(itr);
-  var s   = state.load(focused);
+function setIterations(lc, itr, note) {
+  var s = state.load(focused);
   s.iterations = itr;
   state.save(focused, s);
   controls[focused].iterations = itr;
   gui.updateIterations(focused, itr);
+  lights.forIterations(lc, note);
 }
 
 
