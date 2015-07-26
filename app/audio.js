@@ -11,13 +11,16 @@ class WavetableSynth {
   constructor() {
     var source = audioCtx.createBufferSource(),
         buffer = audioCtx.createBuffer(2, numSamples, audioCtx.sampleRate);
-    this.channels = {};
-    this.channels.left  = buffer.getChannelData(0);
-    this.channels.right = buffer.getChannelData(1);
-    source.playbackRate.value = 0.3;
+    this.channels = {
+      left:  buffer.getChannelData(0),
+      right: buffer.getChannelData(1),
+    };
+    this.gain = audioCtx.createGain();
+    source.playbackRate.value = 1 / 8;
     source.loop   = true;
     source.buffer = buffer;
-    source.connect(audioCtx.destination);
+    source.connect(this.gain);
+    this.gain.connect(audioCtx.destination);
     source.start();
   }
 
@@ -33,6 +36,13 @@ class WavetableSynth {
   }
   get wavetable() {
     return [this.channels.left, this.channels.right];
+  }
+
+  set volume(value) {
+    this.gain.gain.value = value;
+  }
+  get volume() {
+    return this.gain.gain.value;
   }
 }
 

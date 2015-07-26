@@ -7,7 +7,7 @@ import state from 'state';
 var debouncedTimeouts = [],
     workers = [];
 
-function update(i, data) {
+function updateSynthAndGUI(i, data) {
   var cantor    = data.cantor,
       wavetable = cantor[cantor.length - 1];
   state.save(i, data);
@@ -28,8 +28,7 @@ function play(i, pattern, iterations) {
       data = { pattern, iterations };
   cb = function(e) {
     data.cantor = e.data;
-    update(i, data);
-    console.log('Fractal generated');
+    updateSynthAndGUI(i, data);
   };
   resetWorker(i, cb);
   workers[i].postMessage([pattern, iterations]);
@@ -43,4 +42,8 @@ function playDebounced(i, pattern, iterations, timeout = 250) {
   );
 }
 
-export default { play, playDebounced };
+function volume(i, value) {
+  audio.synths[i].volume = value;
+}
+
+export default { play, playDebounced, volume };
