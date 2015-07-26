@@ -7,7 +7,7 @@ function isEncoder(msg) {
 }
 
 function fromEncoder(msg) {
-  var encoder = Math.abs(msg[1] - 23),
+  var encoder = msg[1] - 16,
       change  = msg[2] - 64;
   return { encoder, change };
 }

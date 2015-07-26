@@ -2,13 +2,14 @@
 
 import midiAccess from 'midi';
 import message    from 'controllers/cmd-lc1/message';
+import controls   from 'controllers/cmd-lc1/controls';
 
 var lc;
 
 function recieveMIDIMessage(e) {
   var msg = e.data;
   if (message.isEncoder(msg)) {
-    console.log(message.fromEncoder(msg));
+    controls.adjustPattern(message.fromEncoder(msg));
   }
 }
 
