@@ -7,17 +7,15 @@ import controls   from 'controllers/cmd-lc1/controls';
 var lc;
 
 function recieveMIDIMessage(e) {
-  var x, y, a, msg = e.data;
+  var msg = e.data;
   if (message.isEncoder(msg)) {
     controls.adjustPattern(message.fromEncoder(msg));
 
   } else if (message.isNumberOn(msg)) {
     controls.setFocus(message.fromNumberOn(msg));
 
-  } else if (message.isGridOn(msg)) {
-    [x, y] = message.fromGrid(msg);
-    a = (x * 8) + (y + 1);
-    controls.setIterations(lc, Math.min(a, 16), msg[1]);
+  } else if (message.isGridOn(msg) && msg[1] < 48) {
+    controls.setIterations(lc, msg[1] - 31);
   }
 }
 

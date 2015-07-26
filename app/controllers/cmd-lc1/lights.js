@@ -1,7 +1,5 @@
 'use strict';
 
-import message from 'controllers/cmd-lc1/message';
-
 function on(lc, note) {
   lc.output.send([144, note, 3]);
 }
@@ -9,15 +7,14 @@ function off(lc, note) {
   lc.output.send([144, note, 127]);
 }
 
-window.off = off;
-
-function forIterations(lc, note) {
-  var i = 8;
+function forIterations(lc, itr) {
+  var i = 16;
   while (i--) {
-    off(lc, message.gridNoteFromXY([0, i]));
-    off(lc, message.gridNoteFromXY([1, i]));
+    off(lc, i + 32);
   }
-  on(lc, note);
+  while (itr--) {
+    on(lc, itr + 32);
+  }
 }
 
 export default { forIterations };

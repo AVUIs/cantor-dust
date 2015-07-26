@@ -35,13 +35,13 @@ function adjustPattern(msg) {
   player.playDebounced(focused, ctr.pattern, ctr.iterations, 200);
 }
 
-function setIterations(lc, itr, note) {
+function setIterations(lc, itr) {
   var s = state.load(focused);
   s.iterations = itr;
   state.save(focused, s);
   controls[focused].iterations = itr;
   gui.updateIterations(focused, itr);
-  lights.forIterations(lc, note);
+  lights.forIterations(lc, itr);
 }
 
 
