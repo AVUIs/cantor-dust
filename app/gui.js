@@ -45,8 +45,6 @@ function updateSliders(n, params) {
   }
 }
 
-window.updateSliders = updateSliders;
-
 function updateAll() {
   var stateI,
       i = 8;
@@ -72,4 +70,4 @@ function resizeCanvas() {
 window.onresize = resizeCanvas;
 resizeCanvas();
 
-export default { updateCantor, updateIterations };
+export default { updateCantor, updateIterations, updateSliders };

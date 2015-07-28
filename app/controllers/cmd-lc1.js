@@ -3,6 +3,7 @@
 import midiAccess from 'midi';
 import message    from 'controllers/cmd-lc1/message';
 import controls   from 'controllers/cmd-lc1/controls';
+import lights     from 'controllers/cmd-lc1/lights';
 
 var lc;
 
@@ -23,6 +24,7 @@ function registerCMDLC1(input, output) {
   if (input && output) {
     input.onmidimessage = recieveMIDIMessage;
     lc = { input, output };
+    lights.forIterations(lc, 8);
   } else {
     throw 'ERROR: Launchpad MIDI device not found';
   }
