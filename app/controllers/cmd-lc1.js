@@ -4,6 +4,7 @@ import midiAccess from 'midi';
 import message    from 'controllers/cmd-lc1/message';
 import controls   from 'controllers/cmd-lc1/controls';
 import lights     from 'controllers/cmd-lc1/lights';
+import state      from 'state';
 
 var lc;
 
@@ -14,9 +15,11 @@ function handleIterationMessage(msg) {
 }
 
 function handleFocusChange(msg) {
-  var num = message.fromNumber(msg);
+  var num = message.fromNumber(msg),
+      itr = state.load(num).iterations;
   controls.setFocus(num);
   lights.forFocus(lc, num);
+  lights.forIterations(lc, itr);
 }
 
 function recieveMIDIMessage(e) {
