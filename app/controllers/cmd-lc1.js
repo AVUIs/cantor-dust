@@ -7,16 +7,28 @@ import lights     from 'controllers/cmd-lc1/lights';
 
 var lc;
 
+function handleIterationMessage(msg) {
+  var itr = msg[1] - 31;
+  controls.setIterations(itr);
+  lights.forIterations(lc, itr);
+}
+
+function handleFocusChange(msg) {
+  var num = message.fromNumber(msg);
+  controls.setFocus(num);
+  lights.forFocus(lc, num);
+}
+
 function recieveMIDIMessage(e) {
   var msg = e.data;
   if (message.isEncoder(msg)) {
     controls.adjustPattern(message.fromEncoder(msg));
 
   } else if (message.isNumberOn(msg)) {
-    controls.setFocus(message.fromNumberOn(msg));
+    handleFocusChange(msg);
 
   } else if (message.isGridOn(msg) && msg[1] < 48) {
-    controls.setIterations(lc, msg[1] - 31);
+    handleIterationMessage(msg);
   }
 }
 
@@ -25,6 +37,7 @@ function registerCMDLC1(input, output) {
     input.onmidimessage = recieveMIDIMessage;
     lc = { input, output };
     lights.forIterations(lc, 8);
+    lights.forFocus(lc, 0);
   } else {
     throw 'ERROR: Launchpad MIDI device not found';
   }

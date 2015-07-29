@@ -22,8 +22,12 @@ function isNumberOn(msg) {
   return isOn(msg) && y >= 16 && y <= 23;
 }
 
-function fromNumberOn(msg) {
+function fromNumber(msg) {
   return msg[1] - 16;
+}
+
+function toNumber(n) {
+  return n + 16;
 }
 
 
@@ -57,7 +61,7 @@ function fromGrid(msg) {
 
 export default {
   isEncoder,      fromEncoder,
-  isNumberOn,     fromNumberOn,
+  isNumberOn,     fromNumber,  toNumber,
   isRecOn,        fromRecOn,
   isGridOn,       fromGrid,
   gridNoteFromXY,
