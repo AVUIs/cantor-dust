@@ -34,4 +34,17 @@ function forFocus(lc, n) {
   numBlue(lc, message.toNumber(n));
 }
 
-export default { forIterations, forFocus };
+function forPattern(lc, pattern) {
+  var i = 8,
+      val, numLights;
+  while (i--) {
+    val = pattern[i];
+    if (val !== undefined) {
+      numLights = Math.ceil(15 * val);
+      lc.output.send([176, i + 16, numLights]);
+    }
+  }
+  window.f = function(x, y, z) { lc.output.send([x, y, z]); };
+}
+
+export default { forIterations, forFocus, forPattern };

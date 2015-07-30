@@ -5,8 +5,16 @@ import message    from 'controllers/cmd-lc1/message';
 import controls   from 'controllers/cmd-lc1/controls';
 import lights     from 'controllers/cmd-lc1/lights';
 import state      from 'state';
+import gui        from 'gui';
 
 var lc;
+
+function handleEncoder(msg) {
+  var val = message.fromEncoder(msg),
+      [i, pat] = controls.adjustPattern(val);
+  lights.forPattern(lc, pat);
+  gui.updateSliders(i, pat);
+}
 
 function handleIterationMessage(msg) {
   var itr = msg[1] - 31;
@@ -16,16 +24,19 @@ function handleIterationMessage(msg) {
 
 function handleFocusChange(msg) {
   var num = message.fromNumber(msg),
-      itr = state.load(num).iterations;
+      sta = state.load(num),
+      pat = sta.pattern,
+      itr = sta.iterations;
   controls.setFocus(num);
   lights.forFocus(lc, num);
   lights.forIterations(lc, itr);
+  lights.forPattern(lc, pat);
 }
 
 function recieveMIDIMessage(e) {
   var msg = e.data;
   if (message.isEncoder(msg)) {
-    controls.adjustPattern(message.fromEncoder(msg));
+    handleEncoder(msg);
 
   } else if (message.isNumberOn(msg)) {
     handleFocusChange(msg);

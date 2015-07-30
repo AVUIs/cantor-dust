@@ -5,7 +5,7 @@ import state  from 'state';
 import gui    from 'gui';
 
 var focused  = 0,
-    stepSize = 0.02,
+    stepSize = 0.03,
     controls = [];
 
 function init() {
@@ -32,6 +32,7 @@ function adjustPattern(msg) {
     pattern[msg.encoder] = val;
   }
   player.playDebounced(focused, ctr.pattern, ctr.iterations, 200);
+  return [focused, pattern];
 }
 
 function setIterations(itr) {
