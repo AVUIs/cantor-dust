@@ -4,6 +4,7 @@ import midiAccess from 'midi';
 import message    from 'controllers/cmd-lc1/message';
 import controls   from 'controllers/cmd-lc1/controls';
 import lights     from 'controllers/cmd-lc1/lights';
+import player     from 'player';
 import state      from 'state';
 import gui        from 'gui';
 
@@ -20,6 +21,17 @@ function handleIterationMessage(msg) {
   var itr = msg[1] - 31;
   controls.setIterations(itr);
   lights.forIterations(lc, itr);
+}
+
+function handleQuietenMessage(msg) {
+  var i = msg[1] - 48,
+      st = state.load(i),
+      pat = st.pattern.map((e) => e * 0.95);
+  st.pattern = pat;
+  state.save(i, st);
+  player.playDebounced(i, st.pattern, st.iterations, 150);
+  lights.forPattern(lc, pat);
+  gui.updateSliders(i, pat);
 }
 
 function handleFocusChange(msg) {
@@ -41,8 +53,12 @@ function recieveMIDIMessage(e) {
   } else if (message.isNumberOn(msg)) {
     handleFocusChange(msg);
 
-  } else if (message.isGridOn(msg) && msg[1] < 48) {
-    handleIterationMessage(msg);
+  } else if (message.isGridOn(msg)) {
+    if(msg[1] < 48) {
+      handleIterationMessage(msg);
+    } else {
+      handleQuietenMessage(msg);
+    }
   }
 }
 
