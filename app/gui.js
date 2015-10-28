@@ -3,7 +3,7 @@
 import cantor from 'gui/cantor';
 import state  from 'state';
 
-var WITHCOLOURS = false;
+var WITHCOLOURS = true;
 
 var canvas = document.querySelector('canvas'),
     ctx    = canvas.getContext('2d'),
