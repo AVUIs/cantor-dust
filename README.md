@@ -71,6 +71,34 @@ brunch watch -s
 # And then navigate to http://localhost:3333/
 ```
 
+### Keyboard Controls
+
+```
+1-8       Focus on the nth fractal generator
+up/down   Alternatively, shift the focus with the cursor keys
+```
+
+All operations below effect the focused generator:
+
+```
+q/a       Increase/Decrease the value of the first pattern slice
+w/s       Increase/Decrease the value of the second pattern slice
+e/d       Increase/Decrease the value of the third pattern slice
+r/f       Increase/Decrease the value of the forth pattern slice
+
+x         Reset all pattern slices
+
+c         Copy the focused pattern
+v         Paste the copied pattern
+
+[         Decrease the number of iterations (min: 1)
+]         Increase the number of iterations (max: 8)
+
+-         Decrease the volume
+=         Increase the volume
+0         Toggle mute
+```
+
 ## LICENCE
 
 ```

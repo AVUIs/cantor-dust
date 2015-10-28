@@ -5,7 +5,7 @@ exports.config = {
     javascripts: {
       joinTo: {
         'main.js':   /^app/,
-        // 'vendor.js': /^vendor/,
+        'vendor.js': /^vendor/,
       }
     },
   },

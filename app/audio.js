@@ -11,6 +11,7 @@ class WavetableSynth {
   constructor() {
     var source = audioCtx.createBufferSource(),
         buffer = audioCtx.createBuffer(2, numSamples, audioCtx.sampleRate);
+    var mutedvolume = undefined;
     this.channels = {
       left:  buffer.getChannelData(0),
       right: buffer.getChannelData(1),
@@ -43,6 +44,17 @@ class WavetableSynth {
   }
   get volume() {
     return this.gain.gain.value;
+  }
+  
+  togglemute() {
+    if (this.mutedvolume === undefined) {
+      this.mutedvolume = this.gain.gain.value;
+      this.gain.gain.value = 0.0;
+    }
+    else {
+      this.gain.gain.value = this.mutedvolume;
+      this.mutedvolume = undefined;
+    }      
   }
 }
 

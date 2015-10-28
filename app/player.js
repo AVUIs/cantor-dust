@@ -43,8 +43,24 @@ function playDebounced(i, pattern, iterations, timeout = 250) {
   );
 }
 
-function volume(i, value) {
-  audio.synths[i].volume = value;
+function togglemute(i) {
+  audio.synths[i].togglemute();
 }
 
-export default { play, playDebounced, volume };
+function volume(i, value, isdelta) {
+  var vol = audio.synths[i].volume;
+  
+  if (isdelta)
+    vol = vol + value;
+  else
+    vol = value;
+  
+  if (vol < 0.0)
+    vol = 0;
+  if (vol > 2.0)
+    vol = 2.0;
+  
+  audio.synths[i].volume = vol;
+}
+
+export default { play, playDebounced, volume, togglemute };
