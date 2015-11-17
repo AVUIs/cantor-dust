@@ -4,7 +4,7 @@
   "description": "Fractal audio synthesis",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "./node_modules/brunch/bin/brunch watch --server"
   },
   "repository": {
     "type": "git",
