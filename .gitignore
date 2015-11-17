@@ -4,3 +4,4 @@ public
 !dist/index.html
 .tern-port
 **/.tern-port
+.attic

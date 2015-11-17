@@ -91,8 +91,13 @@ x         Reset all pattern slices
 c         Copy the focused pattern
 v         Paste the copied pattern
 
+i         Invert the focused pattern
+
 [         Decrease the number of iterations (min: 1)
 ]         Increase the number of iterations (max: 8)
+
+.         Decrease the playrate (by 1/sqrt(2))
+.         Increase the playrate (by sqrt(2))
 
 -         Decrease the volume
 =         Increase the volume

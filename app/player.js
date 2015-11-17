@@ -63,4 +63,8 @@ function volume(i, value, isdelta) {
   audio.synths[i].volume = vol;
 }
 
-export default { play, playDebounced, volume, togglemute };
+function playRatechange(i, factor) {
+  audio.synths[i].playRatechange(factor);  
+}
+
+export default { play, playDebounced, volume, togglemute, playRatechange };

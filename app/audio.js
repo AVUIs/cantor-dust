@@ -16,6 +16,7 @@ class WavetableSynth {
       left:  buffer.getChannelData(0),
       right: buffer.getChannelData(1),
     };
+    this.source = source;
     this.gain = audioCtx.createGain();
     source.playbackRate.value = 1 / 8;
     source.loop   = true;
@@ -30,6 +31,9 @@ class WavetableSynth {
         left  = this.channels.left,
         right = this.channels.right,
         len, i;
+
+    //console.log(numFrames /*2^14*/, left.length /*2^19*/);
+    
     for (i = 0, len = left.length; i < len; i++) {
       left[i]  = samples[i % numFrames];
       right[i] = samples[i % numFrames];
@@ -39,6 +43,16 @@ class WavetableSynth {
     return [this.channels.left, this.channels.right];
   }
 
+  playRatechange(factor) {
+    var rate = this.source.playbackRate.value;
+    rate *= factor;
+    if (rate > 1)
+      rate = 1;
+    this.source.playbackRate.value = rate;
+    return rate;
+  }
+    
+  
   set volume(value) {
     this.gain.gain.value = value;
   }

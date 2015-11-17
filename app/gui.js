@@ -3,7 +3,18 @@
 import cantor from 'gui/cantor';
 import state  from 'state';
 
-var WITHCOLOURS = true;
+var ORIGINAL_STYLE = {
+  withColours: true,
+  invertColours: false,
+  drawAllLevels: true
+}
+
+var STYLE = {
+  withColours: false,
+  invertColours: false,
+  drawAllLevels: true 
+}
+
 
 var canvas = document.querySelector('canvas'),
     ctx    = canvas.getContext('2d'),
@@ -15,7 +26,7 @@ function dim(i) {
 }
 
 function updateCantor(i, cantorArr) {
-  cantor.plot(ctx, cantorArr, dim(i), WITHCOLOURS);
+  cantor.plot(ctx, cantorArr, dim(i), STYLE);
 }
 
 function updateIterations(i, iterations) {
@@ -87,4 +98,4 @@ function resizeCanvas() {
 window.onresize = resizeCanvas;
 resizeCanvas();
 
-export default { updateCantor, updateIterations, updateSliders, WITHCOLOURS };
+export default { updateCantor, updateIterations, updateSliders, STYLE };

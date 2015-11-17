@@ -1,67 +1,76 @@
 import controls   from 'controllers/cmd-lc1/controls';
 import gui    from 'gui';
-import state    from 'state';
+import state  from 'state';
 import player from 'player';
-
-//window.onkeypress = function(e) { alert(e); console.log(e);}
-
-//window.addEventListener("keypress", function (e) {alert(e);console.log(e);}, true);
 
 function initKeyboard() {
 
   controls.init();
   
   // Focus on a generator
-  key('1', function() { controls.setFocus(0); });
-  key('2', function() { controls.setFocus(1); });
-  key('3', function() { controls.setFocus(2); });
-  key('4', function() { controls.setFocus(3); });
-  key('5', function() { controls.setFocus(4); });
-  key('6', function() { controls.setFocus(5); });
-  key('7', function() { controls.setFocus(6); });
-  key('8', function() { controls.setFocus(7); }); 
+  key('1', () => controls.setFocus(0));
+  key('2', () => controls.setFocus(1));
+  key('3', () => controls.setFocus(2));
+  key('4', () => controls.setFocus(3));
+  key('5', () => controls.setFocus(4));
+  key('6', () => controls.setFocus(5));
+  key('7', () => controls.setFocus(6));
+  key('8', () => controls.setFocus(7)); 
 
   // or move the focus with the arrow keys  
-  key('up', function() { controls.setFocus((state.focus - 1 + 8)  % 8); });
-  key('down', function() { controls.setFocus((state.focus + 1) % 8); });
+  key('up', () => controls.setFocus((state.focus - 1 + 8)  % 8));
+  key('down', () => controls.setFocus((state.focus + 1) % 8));
 
   
   // increase/decrease the first slider
-  key('q', function() { adjustPatternAndUpdateSliders(0, 1); } );
-  key('a', function() { adjustPatternAndUpdateSliders(0, -1); });
+  key('q', () => adjustPatternAndUpdateSliders(0, 1) );
+  key('a', () => adjustPatternAndUpdateSliders(0, -1));
 
   // increase/decrease the second slider
-  key('w', function() { adjustPatternAndUpdateSliders(1, 1); } );
-  key('s', function() { adjustPatternAndUpdateSliders(1, -1); });
+  key('w', () => adjustPatternAndUpdateSliders(1, 1) );
+  key('s', () => adjustPatternAndUpdateSliders(1, -1));
 
   // increase/decrease the third slider
-  key('e', function() { adjustPatternAndUpdateSliders(2, 1); } );
-  key('d', function() { adjustPatternAndUpdateSliders(2, -1); });
+  key('e', () => adjustPatternAndUpdateSliders(2, 1) );
+  key('d', () => adjustPatternAndUpdateSliders(2, -1));
 
   // increase/decrease the forth slider
-  key('r', function() { adjustPatternAndUpdateSliders(3, 1); } );
-  key('f', function() { adjustPatternAndUpdateSliders(3, -1); });
+  key('r', () => adjustPatternAndUpdateSliders(3, 1) );
+  key('f', () => adjustPatternAndUpdateSliders(3, -1));
 
-  // copy the state & sliders of the focused the generator
-  key('c', function() { state.copytobuffer(state.focus); });
+  // increase/decrease the fifth slider
+  key('t', () => adjustPatternAndUpdateSliders(4, 1) );
+  key('g', () => adjustPatternAndUpdateSliders(4, -1));
+
+  
+  // copy the state & sliders of the focused generator
+  key('c', () => state.copytobuffer(state.focus));
 
   // paste the copied state & slider settings into the newly focused generator
-  key('v', function() { var saved = state.savefrombuffer(state.focus);
-			if (!saved) return;
-			controls.save(state.focus, saved);
-			adjustPatternAndUpdateSliders(state.focus, /*force-redraw*/0 );});
+  key('v', () => { var saved = state.savefrombuffer(state.focus);
+		   if (!saved) return;
+		   controls.save(state.focus, saved);
+		   adjustPatternAndUpdateSliders(state.focus, /*force-redraw*/0 ) });
 
-  key('x', function() { controls.resetFocusedPattern(); } );
+  key('x', () => controls.resetFocusedPattern() );
 
-  key('[', function() { controls.setIterations(-1, /*isdelta*/true); controls.restartFocused();});
-  key(']', function() { controls.setIterations(1,  /*isdelta*/true); controls.restartFocused();});
+  key('[', () => { controls.setIterations(-1, /*isdelta*/true); controls.restartFocused() });
+  key(']', () => { controls.setIterations(1,  /*isdelta*/true); controls.restartFocused() });
 
 
-  key('-', function() { player.volume(state.focus, -0.1, true); });
-  key('=', function() { player.volume(state.focus, 0.1, true); });
-  key('0', function() { player.togglemute(state.focus); });
+  key('-', () => player.volume(state.focus, -0.1, true));
+  key('=', () => player.volume(state.focus, 0.1, true));
+  key('0', () => player.togglemute(state.focus));
 
-  key('i', function() { controls.invertFocusedPattern(); } );
+  
+  var PLAYRATE_UP_FACTOR = Math.sqrt(2),
+      PLAYRATE_DOWN_FACTOR = 1/PLAYRATE_UP_FACTOR;
+
+  key(',', () => player.playRatechange(state.focus, PLAYRATE_DOWN_FACTOR));
+  key('.', () => player.playRatechange(state.focus, PLAYRATE_UP_FACTOR));
+  
+  key('i', () => controls.invertFocusedPattern() );
+
   
 }
 
