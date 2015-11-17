@@ -78,15 +78,16 @@ class GibberishSamplerSynth {
 }
 
 
-function loadSynthParamsFromState() {
-  synths = synths.map( (synth,i) => {
-    var stateI = state.load(synth.id);
+function loadSynthParamsFromState(ids = []) {
+  ids.map( (id) => {
+    var stateI = state.load(id),
+	synthI = synths[id];
     if (stateI.amp)
-      synth.volume = stateI.amp;
+      synthI.volume = stateI.amp;
     if (stateI.pitch)
-      synth.sampler.pitch = stateI.pitch;
+      synthI.sampler.pitch = stateI.pitch;
     if (stateI.phase)
-      synth.sampler.setPhase(stateI.phase);	
+      synthI.sampler.setPhase(stateI.phase);	
   });
 }
 

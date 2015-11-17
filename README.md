@@ -102,6 +102,9 @@ i         Invert the focused pattern
 -         Decrease the volume
 =         Increase the volume
 0         Toggle mute
+
+Shift-L   Toggle scanlines off/on
+
 ```
 
 **Experimental**: It is also possible to save the overall state of the instrument by encoding it to the URL, and later recreating it by visiting the same url:

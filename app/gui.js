@@ -6,13 +6,15 @@ import state  from 'state';
 var ORIGINAL_STYLE = {
   withColours: true,
   invertColours: false,
-  drawAllLevels: true
+  drawAllLevels: true,
+  drawScanLines: false
 }
 
 var STYLE = {
   withColours: false,
   invertColours: false,
-  drawAllLevels: true 
+  drawAllLevels: true,
+  drawScanLines: true
 }
 
 
@@ -74,6 +76,11 @@ function updateSliders(n, params) {
 }
 
 function updateScanners() {
+  if (!STYLE.drawScanLines) {
+    requestAnimationFrame(updateScanners);
+    return;
+  }
+  
   var stateI,
       i = 8;
 

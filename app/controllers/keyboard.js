@@ -2,6 +2,7 @@ import controls   from 'controllers/cmd-lc1/controls';
 import gui    from 'gui';
 import state  from 'state';
 import player from 'player';
+import audio from 'gibberish-audio';
 
 function initKeyboard() {
 
@@ -50,6 +51,7 @@ function initKeyboard() {
   key('v', () => { var saved = state.savefrombuffer(state.focus);
 		   if (!saved) return;
 		   controls.save(state.focus, saved);
+		   audio.loadSynthParamsFromState([state.focus]);
 		   adjustPatternAndUpdateSliders(state.focus, /*force-redraw*/0 ) });
 
   key('x', () => controls.resetFocusedPattern() );
@@ -73,6 +75,8 @@ function initKeyboard() {
 
 
   key('shift+s', () => state.saveToURL()); // state -> url
+
+  key('shift+l', () => gui.STYLE.drawScanLines = !gui.STYLE.drawScanLines);
   
 }
 
