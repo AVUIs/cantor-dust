@@ -76,10 +76,8 @@ function updateSliders(n, params) {
 }
 
 function updateScanners() {
-  if (!STYLE.drawScanLines) {
-    requestAnimationFrame(updateScanners);
+  if (!STYLE.drawScanLines) 
     return;
-  }
   
   var stateI,
       i = 8;
@@ -144,4 +142,4 @@ resizeCanvas();
 
 updateScanners();
 
-export default { updateCantor, updateIterations, updateSliders, STYLE };
+export default { updateCantor, updateIterations, updateSliders, updateScanners, STYLE };

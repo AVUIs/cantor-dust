@@ -76,7 +76,7 @@ function initKeyboard() {
 
   key('shift+s', () => state.saveToURL()); // state -> url
 
-  key('shift+l', () => gui.STYLE.drawScanLines = !gui.STYLE.drawScanLines);
+  key('shift+l', () => { gui.STYLE.drawScanLines = !gui.STYLE.drawScanLines; gui.updateScanners() });
   
 }
 
