@@ -1,6 +1,6 @@
 'use strict';
 
-import audio from 'audio';
+import audio from 'gibberish-audio';
 import gui   from 'gui';
 import state from 'state';
 
