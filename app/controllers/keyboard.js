@@ -71,6 +71,8 @@ function initKeyboard() {
   
   key('i', () => controls.invertFocusedPattern() );
 
+
+  key('shift+s', () => state.saveToURL()); // state -> url
   
 }
 

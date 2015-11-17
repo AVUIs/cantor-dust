@@ -22,7 +22,9 @@ class GibberishSamplerSynth {
 
     this.sampler = sampler;
     this.mutedvolume = undefined;
+    this.id = sampler.id;
 
+    
     // a little hacky, but this is what Gibberish gives us
     var sequencer = new Gibberish.Sequencer({
       target:sampler,    // attach to the sampler, 
@@ -50,10 +52,12 @@ class GibberishSamplerSynth {
 
   playRatechange(factor) {
     this.sampler.pitch *= factor;
+    state.load(this.id).pitch = this.sampler.pitch;
     return this.sampler.pitch;
   }
 
   set volume(value) {
+    state.load(this.id).amp = this.sampler.amp;
     this.sampler.amp = value;
   }
 
@@ -74,9 +78,21 @@ class GibberishSamplerSynth {
 }
 
 
+function loadSynthParamsFromState() {
+  synths = synths.map( (synth,i) => {
+    var stateI = state.load(synth.id);
+    if (stateI.amp)
+      synth.volume = stateI.amp;
+    if (stateI.pitch)
+      synth.sampler.pitch = stateI.pitch;
+    if (stateI.phase)
+      synth.sampler.setPhase(stateI.phase);	
+  });
+}
+
 synths = synths.map((e,i) => new GibberishSamplerSynth({id:i}));
 
-export default { synths, numSamples };
+export default { synths, loadSynthParamsFromState, numSamples };
 
     
 	

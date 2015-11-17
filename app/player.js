@@ -57,8 +57,8 @@ function volume(i, value, isdelta) {
   
   if (vol < 0.0)
     vol = 0;
-  if (vol > 2.0)
-    vol = 2.0;
+  if (vol > 10.0)
+    vol = 10.0;
   
   audio.synths[i].volume = vol;
 }

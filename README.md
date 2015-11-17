@@ -104,6 +104,12 @@ i         Invert the focused pattern
 0         Toggle mute
 ```
 
+EXPERIMENTAL: It is also possible to save the overall state of the instrument by encoding it to the URL, and later recreating it by visiting the same url:
+
+```
+Shift-S   Save overall state to URL (which you can copy, share, revisit, etc)
+```
+
 ## LICENCE
 
 ```
