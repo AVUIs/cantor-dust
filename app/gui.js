@@ -16,8 +16,10 @@ var STYLE = {
 }
 
 
-var canvas = document.querySelector('canvas'),
+var canvas = document.querySelector('canvas#fractal-layer'),
     ctx    = canvas.getContext('2d'),
+    scannerCanvas = document.querySelector('canvas#scanner-layer'),
+    scannerCtx = scannerCanvas.getContext('2d'),
     segmentH = window.innerHeight / 8;
 
 
@@ -71,6 +73,40 @@ function updateSliders(n, params) {
   }
 }
 
+function updateScanners() {
+  var stateI,
+      i = 8;
+
+  //FIXME: because removing just the single mark doesn't work reliably
+  scannerCtx.clearRect(0,0,scannerCanvas.width, scannerCanvas.height);
+  
+  while(i--) {
+    stateI = state.load(i);
+    updateScanner(i,stateI);
+  }
+
+  requestAnimationFrame(updateScanners);
+}
+
+function updateScanner(i,stateI) {
+  var dimI = dim(i);
+
+  //FIXME: this skips and misses some of the marks unfortunately -- disabling it, and using the
+  //fullscreen clearRect in updateScanners() above
+  if (false && stateI.lastphaseOnScreen !== undefined) {
+    scannerCtx.clearRect(stateI.lastphaseOnScreen, dimI.y, 1, dimI.h);
+  }
+
+  if (stateI.phase !== undefined) {
+    // we really shouldn't be doing this here at every update
+    var numSamples = Math.pow(stateI.pattern.length, stateI.iterations);
+    var phaseOnScreen = Math.round( (stateI.phase/numSamples) * dimI.w + dimI.x );
+    scannerCtx.fillStyle = 'white';
+    scannerCtx.fillRect(phaseOnScreen, dimI.y, 1, dimI.h);
+    stateI.lastphaseOnScreen = phaseOnScreen;
+  }
+}
+  
 function updateAll() {
   var stateI,
       i = 8;
@@ -91,11 +127,14 @@ function updateAll() {
 function resizeCanvas() {
   canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight - 4;
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight - 4;
+
+  scannerCanvas.width = canvas.width;
+  scannerCanvas.height = canvas.height;
 }
 
 window.onresize = resizeCanvas;
 resizeCanvas();
+
+updateScanners();
 
 export default { updateCantor, updateIterations, updateSliders, STYLE };

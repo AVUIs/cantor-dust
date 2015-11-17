@@ -18,3 +18,6 @@ initKeyboard();
 
 import { availableDevices } from 'midi';
 window.availableDevices = availableDevices;
+
+import state from 'state';
+window.state = state;

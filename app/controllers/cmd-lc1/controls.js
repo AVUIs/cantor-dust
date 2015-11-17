@@ -59,7 +59,7 @@ function adjustPattern(msg) {
     val = Math.max(0, val);
     pattern[msg.encoder] = val;
   }
-  player.playDebounced(focused, ctr.pattern, ctr.iterations, 50 /*BE 200*/);
+  player.playDebounced(focused, ctr.pattern, ctr.iterations, 200);
 
 
   return [focused, pattern];

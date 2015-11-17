@@ -9,11 +9,12 @@ function save(i, data) {
 }
 
 function load(i) {
-  return state[i] || { iterations: 7, pattern: [0.5,0.5,0.5,0.5] };
+  return state[i] || { iterations: 7, pattern: [0.5,0.5,0.5,0.5], phase:undefined, lastphaseOnScreen:undefined };
 }
 
 function copytobuffer(i) {
   buffer = Object.assign ({}, state[i]);
+  buffer.phase = buffer.lastphaseOnScreen = undefined; // don't copy these for now
 }
 
 function savefrombuffer(i) {
