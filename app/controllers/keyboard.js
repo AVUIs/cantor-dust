@@ -56,23 +56,63 @@ function initKeyboard() {
 
   key('x', () => controls.resetFocusedPattern() );
 
+  key('i', () => controls.invertFocusedPattern() );
+  
+  
   key('[', () => { controls.setIterations(-1, /*isdelta*/true); controls.restartFocused() });
   key(']', () => { controls.setIterations(1,  /*isdelta*/true); controls.restartFocused() });
 
 
+  /* VOLUME */
+
+  // control the volume of the focused generator
   key('-', () => player.volume(state.focus, -0.1, true));
   key('=', () => player.volume(state.focus, 0.1, true));
   key('0', () => player.togglemute(state.focus));
 
+  // control the volume of all but the focused generator
+  key('alt+-', () => audio.allSynthsButFocused( (s) => { player.volume(s.id, -0.1, true); }));
+  key('alt+=', () => audio.allSynthsButFocused( (s) => { player.volume(s.id, 0.1, true); }));
+  key('alt+0', () => audio.allSynthsButFocused( (s) => { player.togglemute(s.id); }));
+
+  // control the volume of all generators
+  key('shift+-', () => audio.allSynths( (s) => { player.volume(s.id, -0.1, true); }));
+  key('shift+=', () => audio.allSynths( (s) => { player.volume(s.id, 0.1, true); }));
+  key('shift+0', () => audio.allSynths( (s) => { player.togglemute(s.id); }));
+  
+
+  /* PITCH (PLAYRATE) */
   
   var PLAYRATE_UP_FACTOR = Math.sqrt(2),
       PLAYRATE_DOWN_FACTOR = 1/PLAYRATE_UP_FACTOR;
 
-  key(',', () => player.playRatechange(state.focus, PLAYRATE_DOWN_FACTOR));
-  key('.', () => player.playRatechange(state.focus, PLAYRATE_UP_FACTOR));
-  
-  key('i', () => controls.invertFocusedPattern() );
+  // control the pitch (playrate) of the focused generator
+  key(',', () => audio.focusedSynth( (s) => s.playRatechange(PLAYRATE_DOWN_FACTOR)));
+  key('.', () => audio.focusedSynth( (s) => s.playRatechange(PLAYRATE_UP_FACTOR)));
+  key('m', () => audio.focusedSynth( (s) => { s.pitch = 1/8; } ));
 
+  // control the pitch (playrate) of all but the focused generator
+  key('alt+,', () => audio.allSynthsButFocused( (s) => { s.playRatechange(PLAYRATE_DOWN_FACTOR) }));
+  key('alt+.', () => audio.allSynthsButFocused( (s) => { s.playRatechange(PLAYRATE_UP_FACTOR) }));
+  key('alt+m', () => audio.allSynthsButFocused( (s) => { s.pitch = 1/8; } ));
+
+  // control the pitch (playrate) of all generators
+  key('shift+m', () => audio.allSynths( (s) => { s.pitch = 1/8; } ));
+
+  
+  /* PHASE */
+
+  // control the phase of the focused generator
+  key('p', () => audio.focusedSynth( (s) => { s.phase = 0; }));
+  
+  // control the phase of all but the focused generator
+  key('alt+p', () => audio.allSynthsButFocused( (s) => { s.phase = 0; }));
+  
+  // control the phase of all generators
+  key('shift+p', () => audio.allSynths( (s) => { s.phase = 0; }));
+
+
+  /* MISC */
 
   key('shift+s', () => state.saveToURL()); // state -> url
 

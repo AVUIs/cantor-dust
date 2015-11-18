@@ -50,19 +50,41 @@ class GibberishSamplerSynth {
     return [this.sampler.getBuffer(), this.sampler.getBuffer()];
   }
 
+
+  set pitch(pitch) {
+    this.sampler.pitch = pitch;
+    state.load(this.id).pitch = this.sampler.pitch;
+  }
+
+  get pitch() {
+    return this.sampler.pitch;
+  }
+  
   playRatechange(factor) {
     this.sampler.pitch *= factor;
     state.load(this.id).pitch = this.sampler.pitch;
     return this.sampler.pitch;
   }
 
-  set volume(value) {
+
+
+  set amp(value) {
     state.load(this.id).amp = this.sampler.amp;
     this.sampler.amp = value;
   }
 
-  get volume() {
+  get amp() {
     return this.sampler.amp;
+  }
+
+  // backwards compatibility
+  set volume(value) {
+    this.amp = value;
+  }
+  
+  // backwards compatibility
+  get volume() {
+    return this.amp;
   }
 
   togglemute() {
@@ -75,25 +97,49 @@ class GibberishSamplerSynth {
       this.mutedvolume = undefined;
     }      
   }
+
+  set phase(phase) {
+    this.sampler.setPhase(phase);
+//    state.load(this.id).phase = this.sampler.phase;
+  }
+    
+  get phase() {
+    return this.sampler.getPhase();
+  }
 }
 
 
-function loadSynthParamsFromState(ids = []) {
+function loadSynthParamsFromState(ids = [], params = ["amp","pitch","phase"]) {
   ids.map( (id) => {
     var stateI = state.load(id),
 	synthI = synths[id];
-    if (stateI.amp)
-      synthI.volume = stateI.amp;
-    if (stateI.pitch)
-      synthI.sampler.pitch = stateI.pitch;
-    if (stateI.phase)
-      synthI.sampler.setPhase(stateI.phase);	
+
+    params.forEach( (param,i) => {
+      if (stateI[param]) synthI[param] = state[param];
+    });    
   });
 }
 
+function synth(i, fn) {
+  fn(synths[i]);
+}
+
+function focusedSynth(fn) {
+  fn(synths[state.focus]);
+}
+
+function allSynths(fn) {
+  synths.map( (s,i) => fn(s) );
+}
+
+function allSynthsButFocused(fn) {
+  synths.map( (s,i) => { if (s.id != state.focus) fn(s); } );
+}
+
+
 synths = synths.map((e,i) => new GibberishSamplerSynth({id:i}));
 
-export default { synths, loadSynthParamsFromState, numSamples };
+export default { synths, loadSynthParamsFromState, focusedSynth, allSynths, allSynthsButFocused, numSamples };
 
     
 	

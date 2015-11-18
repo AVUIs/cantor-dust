@@ -83,7 +83,12 @@ And make sure you first have a look at the section on keyboard controls below.
 up/down   Alternatively, shift the focus with the cursor keys
 ```
 
-All operations below effect the focused generator:
+All operations below effect the focused generator.
+
+Additionally, for those marked with (A) or (S): 
+
+(A): pressing the Alt key applies this operation to all the generators **except** the focused one.
+(S): Pressing the Shift key applies this operation to ALL generators.
 
 ```
 q/a       Increase/Decrease the value of the first pattern slice
@@ -101,12 +106,16 @@ i         Invert the focused pattern
 [         Decrease the number of iterations (min: 1)
 ]         Increase the number of iterations (max: 8)
 
-,         Decrease the playrate (by 1/sqrt(2))
-.         Increase the playrate (by sqrt(2))
+,         Decrease the playrate (by 1/sqrt(2))   (A), (S)
+.         Increase the playrate (by sqrt(2))     (A), (S)
+m         Reset the playrate to 1/8              (A), (S)
 
--         Decrease the volume
-=         Increase the volume
-0         Toggle mute
+p         Reset the phase to 0                   (A), (S)
+
+-         Decrease the volume                    (A), (S)
+=         Increase the volume                    (A), (S)
+0         Toggle mute                            (A), (S)
+
 
 Shift-L   Toggle scanlines off/on (if your machine struggles,
                                    or if you get choppy sound)
