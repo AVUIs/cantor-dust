@@ -720,6 +720,10 @@ function initKeyboard() {
     return _controllersCmdLc1Controls2['default'].resetFocusedPattern();
   });
 
+  key('i', function () {
+    return _controllersCmdLc1Controls2['default'].invertFocusedPattern();
+  });
+
   key('[', function () {
     _controllersCmdLc1Controls2['default'].setIterations(-1, /*isdelta*/true);_controllersCmdLc1Controls2['default'].restartFocused();
   });
@@ -727,6 +731,9 @@ function initKeyboard() {
     _controllersCmdLc1Controls2['default'].setIterations(1, /*isdelta*/true);_controllersCmdLc1Controls2['default'].restartFocused();
   });
 
+  /* VOLUME */
+
+  // control the volume of the focused generator
   key('-', function () {
     return _player2['default'].volume(_state2['default'].focus, -0.1, true);
   });
@@ -737,19 +744,110 @@ function initKeyboard() {
     return _player2['default'].togglemute(_state2['default'].focus);
   });
 
+  // control the volume of all but the focused generator
+  key('alt+-', function () {
+    return _gibberishAudio2['default'].allSynthsButFocused(function (s) {
+      _player2['default'].volume(s.id, -0.1, true);
+    });
+  });
+  key('alt+=', function () {
+    return _gibberishAudio2['default'].allSynthsButFocused(function (s) {
+      _player2['default'].volume(s.id, 0.1, true);
+    });
+  });
+  key('alt+0', function () {
+    return _gibberishAudio2['default'].allSynthsButFocused(function (s) {
+      _player2['default'].togglemute(s.id);
+    });
+  });
+
+  // control the volume of all generators
+  key('shift+-', function () {
+    return _gibberishAudio2['default'].allSynths(function (s) {
+      _player2['default'].volume(s.id, -0.1, true);
+    });
+  });
+  key('shift+=', function () {
+    return _gibberishAudio2['default'].allSynths(function (s) {
+      _player2['default'].volume(s.id, 0.1, true);
+    });
+  });
+  key('shift+0', function () {
+    return _gibberishAudio2['default'].allSynths(function (s) {
+      _player2['default'].togglemute(s.id);
+    });
+  });
+
+  /* PITCH (PLAYRATE) */
+
   var PLAYRATE_UP_FACTOR = Math.sqrt(2),
       PLAYRATE_DOWN_FACTOR = 1 / PLAYRATE_UP_FACTOR;
 
+  // control the pitch (playrate) of the focused generator
   key(',', function () {
-    return _player2['default'].playRatechange(_state2['default'].focus, PLAYRATE_DOWN_FACTOR);
+    return _gibberishAudio2['default'].focusedSynth(function (s) {
+      return s.playRatechange(PLAYRATE_DOWN_FACTOR);
+    });
   });
   key('.', function () {
-    return _player2['default'].playRatechange(_state2['default'].focus, PLAYRATE_UP_FACTOR);
+    return _gibberishAudio2['default'].focusedSynth(function (s) {
+      return s.playRatechange(PLAYRATE_UP_FACTOR);
+    });
+  });
+  key('m', function () {
+    return _gibberishAudio2['default'].focusedSynth(function (s) {
+      s.pitch = 1 / 8;
+    });
   });
 
-  key('i', function () {
-    return _controllersCmdLc1Controls2['default'].invertFocusedPattern();
+  // control the pitch (playrate) of all but the focused generator
+  key('alt+,', function () {
+    return _gibberishAudio2['default'].allSynthsButFocused(function (s) {
+      s.playRatechange(PLAYRATE_DOWN_FACTOR);
+    });
   });
+  key('alt+.', function () {
+    return _gibberishAudio2['default'].allSynthsButFocused(function (s) {
+      s.playRatechange(PLAYRATE_UP_FACTOR);
+    });
+  });
+  key('alt+m', function () {
+    return _gibberishAudio2['default'].allSynthsButFocused(function (s) {
+      s.pitch = 1 / 8;
+    });
+  });
+
+  // control the pitch (playrate) of all generators
+  key('shift+m', function () {
+    return _gibberishAudio2['default'].allSynths(function (s) {
+      s.pitch = 1 / 8;
+    });
+  });
+
+  /* PHASE */
+
+  // control the phase of the focused generator
+  key('p', function () {
+    return _gibberishAudio2['default'].focusedSynth(function (s) {
+      s.phase = 0;
+    });
+  });
+
+  // control the phase of all but the focused generator
+  key('alt+p', function () {
+    return _gibberishAudio2['default'].allSynthsButFocused(function (s) {
+      s.phase = 0;
+    });
+  });
+
+  // control the phase of all generators
+  key('shift+p', function () {
+    return _gibberishAudio2['default'].allSynths(function (s) {
+      s.phase = 0;
+    });
+  });
+
+  /* MISC */
 
   key('shift+s', function () {
     return _state2['default'].saveToURL();
@@ -1070,13 +1168,43 @@ var GibberishSamplerSynth = (function () {
       return [this.sampler.getBuffer(), this.sampler.getBuffer()];
     }
   }, {
-    key: 'volume',
+    key: 'pitch',
+    set: function set(pitch) {
+      this.sampler.pitch = pitch;
+      _state2['default'].load(this.id).pitch = this.sampler.pitch;
+    },
+    get: function get() {
+      return this.sampler.pitch;
+    }
+  }, {
+    key: 'amp',
     set: function set(value) {
       _state2['default'].load(this.id).amp = this.sampler.amp;
       this.sampler.amp = value;
     },
     get: function get() {
       return this.sampler.amp;
+    }
+
+    // backwards compatibility
+  }, {
+    key: 'volume',
+    set: function set(value) {
+      this.amp = value;
+    },
+
+    // backwards compatibility
+    get: function get() {
+      return this.amp;
+    }
+  }, {
+    key: 'phase',
+    set: function set(phase) {
+      this.sampler.setPhase(phase);
+      //    state.load(this.id).phase = this.sampler.phase;
+    },
+    get: function get() {
+      return this.sampler.getPhase();
     }
   }]);
 
@@ -1085,13 +1213,35 @@ var GibberishSamplerSynth = (function () {
 
 function loadSynthParamsFromState() {
   var ids = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+  var params = arguments.length <= 1 || arguments[1] === undefined ? ["amp", "pitch", "phase"] : arguments[1];
 
   ids.map(function (id) {
     var stateI = _state2['default'].load(id),
         synthI = synths[id];
-    if (stateI.amp) synthI.volume = stateI.amp;
-    if (stateI.pitch) synthI.sampler.pitch = stateI.pitch;
-    if (stateI.phase) synthI.sampler.setPhase(stateI.phase);
+
+    params.forEach(function (param, i) {
+      if (stateI[param]) synthI[param] = _state2['default'][param];
+    });
+  });
+}
+
+function synth(i, fn) {
+  fn(synths[i]);
+}
+
+function focusedSynth(fn) {
+  fn(synths[_state2['default'].focus]);
+}
+
+function allSynths(fn) {
+  synths.map(function (s, i) {
+    return fn(s);
+  });
+}
+
+function allSynthsButFocused(fn) {
+  synths.map(function (s, i) {
+    if (s.id != _state2['default'].focus) fn(s);
   });
 }
 
@@ -1099,7 +1249,7 @@ synths = synths.map(function (e, i) {
   return new GibberishSamplerSynth({ id: i });
 });
 
-exports['default'] = { synths: synths, loadSynthParamsFromState: loadSynthParamsFromState, numSamples: numSamples };
+exports['default'] = { synths: synths, loadSynthParamsFromState: loadSynthParamsFromState, focusedSynth: focusedSynth, allSynths: allSynths, allSynthsButFocused: allSynthsButFocused, numSamples: numSamples };
 module.exports = exports['default'];
 });
 
