@@ -818,6 +818,16 @@ function initKeyboard() {
   });
 
   // control the pitch (playrate) of all generators
+  key('shift+,', function () {
+    return _gibberishAudio2['default'].allSynths(function (s) {
+      s.playRatechange(PLAYRATE_DOWN_FACTOR);
+    });
+  });
+  key('shift+.', function () {
+    return _gibberishAudio2['default'].allSynths(function (s) {
+      s.playRatechange(PLAYRATE_UP_FACTOR);
+    });
+  });
   key('shift+m', function () {
     return _gibberishAudio2['default'].allSynths(function (s) {
       s.pitch = 1 / 8;
