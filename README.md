@@ -57,17 +57,13 @@ you can install with `brew install node`.
 git clone https://github.com/AVUIs/cantor-dust.git # Clone the project
 cd cantor-dust         # Enter the project directory
 npm install            # Download required node modules
-npm install -g brunch  # Install the brunch build tool
 ```
-
-If the final line throws a big ugly error message, try installing it again
-as root with `sudo npm install -g brunch`. This will require your password.
 
 
 ## Usage
 
 ```sh
-brunch watch -s
+npm start
 # And then navigate to http://localhost:3333/
 ```
 
