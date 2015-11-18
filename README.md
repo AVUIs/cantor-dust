@@ -87,8 +87,8 @@ All operations below effect the focused generator.
 
 Additionally, for those marked with (A) or (S): 
 
-(A): pressing the Alt key applies this operation to all the generators **except** the focused one.
-(S): Pressing the Shift key applies this operation to ALL generators.
+* (A): pressing the Alt key applies this operation to all the generators **except** the focused one.
+* (S): Pressing the Shift key applies this operation to ALL generators.
 
 ```
 q/a       Increase/Decrease the value of the first pattern slice
