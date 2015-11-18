@@ -11,7 +11,7 @@ var ORIGINAL_STYLE = {
 }
 
 var STYLE = {
-  withColours: false,
+  withColours: true,
   invertColours: false,
   drawAllLevels: true,
   drawScanLines: true
@@ -26,7 +26,7 @@ var canvas = document.querySelector('canvas#fractal-layer'),
 
 
 function dim(i) {
-  return { x: 0, y: i * segmentH, w: window.innerWidth - 150, h: segmentH };
+  return { x: 0, y: i * segmentH, w: window.innerWidth - 150, h: segmentH, segmentId: i };
 }
 
 function updateCantor(i, cantorArr) {
