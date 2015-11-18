@@ -97,6 +97,8 @@ function initKeyboard() {
   key('alt+m', () => audio.allSynthsButFocused( (s) => { s.pitch = 1/8; } ));
 
   // control the pitch (playrate) of all generators
+  key('shift+,', () => audio.allSynths( (s) => { s.playRatechange(PLAYRATE_DOWN_FACTOR) }));
+  key('shift+.', () => audio.allSynths( (s) => { s.playRatechange(PLAYRATE_UP_FACTOR) }));
   key('shift+m', () => audio.allSynths( (s) => { s.pitch = 1/8; } ));
 
   
