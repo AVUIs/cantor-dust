@@ -71,6 +71,15 @@ brunch watch -s
 # And then navigate to http://localhost:3333/
 ```
 
+## Online version
+
+You can try out a development version of Cantor Dust at [avuis.github.io/cantor-dust](http://avuis.github.io/cantor-dust/).
+
+Note that this is untested on anything other than recent Chrome and Firefox browsers, so YMMV.
+
+And make sure you first have a look at the section on keyboard controls below.
+
+
 ### Keyboard Controls
 
 ```
@@ -103,7 +112,8 @@ i         Invert the focused pattern
 =         Increase the volume
 0         Toggle mute
 
-Shift-L   Toggle scanlines off/on
+Shift-L   Toggle scanlines off/on (if your machine struggles,
+                                   or if you get choppy sound)
 
 ```
 
@@ -113,7 +123,7 @@ Shift-L   Toggle scanlines off/on
 Shift-S   Save overall state to URL (which you can copy, share, revisit, etc)
 ```
 
-For example, try this [deep sound](http://localhost:3333/#STATE:%5B%7B%22iterations%22:7,%22pattern%22:%5B0.4099999999999999,0.8600000000000003,0.6200000000000001,0.5%5D,%22amp%22:2.000000000000001,%22pitch%22:0.015624999999999993,%22phase%22:9688.99075944447%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.8000000000000003,0.5%5D,%22amp%22:1.8000000000000007,%22pitch%22:0.011048543456039799,%22phase%22:13447.077559855532%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.19999999999999973,0.5%5D,%22amp%22:1.9000000000000008,%22pitch%22:0.0220970869120796,%22phase%22:6193.946044006462%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.8000000000000003,0.5%5D,%22amp%22:1.7000000000000006,%22pitch%22:0.015624999999999993,%22phase%22:10979.765624999998%7D%5D)  (make sure you're running the app on localhost:3333 and you have good speakers)
+For example, try this [deep sound](http://avuis.github.io/cantor-dust/#STATE:%5B%7B%22iterations%22:7,%22pattern%22:%5B0.4099999999999999,0.8600000000000003,0.6200000000000001,0.5%5D,%22amp%22:2.000000000000001,%22pitch%22:0.015624999999999993,%22phase%22:9688.99075944447%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.8000000000000003,0.5%5D,%22amp%22:1.8000000000000007,%22pitch%22:0.011048543456039799,%22phase%22:13447.077559855532%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.19999999999999973,0.5%5D,%22amp%22:1.9000000000000008,%22pitch%22:0.0220970869120796,%22phase%22:6193.946044006462%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.8000000000000003,0.5%5D,%22amp%22:1.7000000000000006,%22pitch%22:0.015624999999999993,%22phase%22:10979.765624999998%7D%5D)  (make sure you have good speakers/headphones)
 
 ## LICENCE
 
