@@ -12,7 +12,7 @@ function loadSynthParamsFromState(ids = [], params = ["amp","pitch","phase"]) {
 	synthI = synths[id];
 
     params.forEach( (param,i) => {
-      if (stateI[param]) synthI[param] = state[param];
+      if (stateI[param]) synthI[param] = stateI[param];
     });    
   });
 }
