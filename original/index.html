@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Cantor Dust</title>
+
+    <style type="text/css" media="screen">
+      body {
+         margin: 0;
+         background: black;
+      }
+      canvas {
+         position: absolute;
+         top: 0;
+         left: 0;
+      }
+      canvas#fractal-layer {
+         background-color: black;
+         z-index: 1;
+      }
+      canvas#scanner-layer {
+         background-color: transparent;
+         z-index: 2;
+      }
+
+    </style>
+  </head>
+  <body>
+    <canvas id="fractal-layer"></canvas>
+    <canvas id="scanner-layer"></canvas>
+
+    <script src="main.js" type="text/javascript" charset="utf-8"></script>
+    <script src="vendor.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+      require('main');
+
+    </script>
+  </body>
+</html>

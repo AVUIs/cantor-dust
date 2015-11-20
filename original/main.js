@@ -112,14 +112,15 @@
 require.register("audio", function(exports, require, module) {
 'use strict';
 
-//import {synths,numSamples} from 'native-audio';
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _gibberishAudio = require('gibberish-audio');
+var _nativeAudio = require('native-audio');
+
+//import {synths,numSamples} from 'gibberish-audio';
 
 var _state = require('state');
 
@@ -131,7 +132,7 @@ function loadSynthParamsFromState() {
 
   ids.map(function (id) {
     var stateI = _state2['default'].load(id),
-        synthI = _gibberishAudio.synths[id];
+        synthI = _nativeAudio.synths[id];
 
     params.forEach(function (param, i) {
       if (stateI[param]) synthI[param] = _state2['default'][param];
@@ -140,26 +141,26 @@ function loadSynthParamsFromState() {
 }
 
 function synth(i, fn) {
-  return fn(_gibberishAudio.synths[i]);
+  return fn(_nativeAudio.synths[i]);
 }
 
 function focusedSynth(fn) {
-  return fn(_gibberishAudio.synths[_state2['default'].focus]);
+  return fn(_nativeAudio.synths[_state2['default'].focus]);
 }
 
 function allSynths(fn) {
-  return _gibberishAudio.synths.map(function (s, i) {
+  return _nativeAudio.synths.map(function (s, i) {
     return fn(s);
   });
 }
 
 function allSynthsButFocused(fn) {
-  return _gibberishAudio.synths.map(function (s, i) {
+  return _nativeAudio.synths.map(function (s, i) {
     if (s.id != _state2['default'].focus) fn(s);
   });
 }
 
-exports['default'] = { synths: _gibberishAudio.synths, numSamples: _gibberishAudio.numSamples, loadSynthParamsFromState: loadSynthParamsFromState, focusedSynth: focusedSynth, allSynths: allSynths, allSynthsButFocused: allSynthsButFocused };
+exports['default'] = { synths: _nativeAudio.synths, numSamples: _nativeAudio.numSamples, loadSynthParamsFromState: loadSynthParamsFromState, focusedSynth: focusedSynth, allSynths: allSynths, allSynthsButFocused: allSynthsButFocused };
 module.exports = exports['default'];
 });
 
