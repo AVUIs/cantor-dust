@@ -134,7 +134,7 @@ function loadSynthParamsFromState() {
         synthI = _gibberishAudio.synths[id];
 
     params.forEach(function (param, i) {
-      if (stateI[param]) synthI[param] = _state2['default'][param];
+      if (stateI[param]) synthI[param] = stateI[param];
     });
   });
 }
