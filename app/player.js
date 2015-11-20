@@ -1,8 +1,10 @@
 'use strict';
 
-import audio from 'gibberish-audio';
+//BE-audio import audio from 'gibberish-audio';
+import audio from 'audio'
 import gui   from 'gui';
 import state from 'state';
+import config from 'config'
 
 var debouncedTimeouts = [],
     workers = [];
@@ -12,8 +14,14 @@ function updateSynthAndGUI(i, data) {
       wavetable = cantor[cantor.length - 1];
   state.save(i, data);
   audio.synths[i].wavetable = wavetable;
-  gui.updateIterations(i, data.iterations);
-  gui.updateCantor(i, cantor);
+
+  if (config.params.AUDIO.resetPhaseOnNewBuffer) {    
+    state.load(i).phase = 0;
+    audio.synths[i].phase = 0;
+  }
+  
+  gui.updateIterations(i, data.iterations); //BE-raf:to-remove
+  gui.updateCantor(i, cantor); //BE-raf:to-remove
 }
 
 function resetWorker(i, cb) {

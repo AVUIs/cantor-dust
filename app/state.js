@@ -9,7 +9,7 @@ function save(i, data) {
 }
 
 function load(i) {
-  return state[i] || { iterations: 7, pattern: [0.5,0.5,0.5,0.5], phase:undefined, lastphaseOnScreen:undefined };
+  return state[i] || { iterations: 7, pattern: [0.5,0.5,0.5,0.5], numSamples: Math.pow(4,7), phase:undefined, lastphaseOnScreen:undefined };
 }
 
 function toJSON() {
@@ -45,6 +45,8 @@ function loadFromURL(url) {
   var json = decodeURI(url).split(/#STATE:/)[1];
   if (json !== undefined) {
     setFromJSON(json);
+    //FIXME: hacky
+    state.forEach( (s) => { if (s && s.pattern && s.iterations) s.numSamples = Math.pow(s.pattern.length, s.iterations) } );
     return true;
   }
   else {

@@ -26,15 +26,16 @@ class GibberishSamplerSynth {
 
     
     // a little hacky, but this is what Gibberish gives us
-    var sequencer = new Gibberish.Sequencer({
-      target:sampler,    // attach to the sampler, 
-      key:'ontick',      // ... and invoke its ontick method
-      durations:[100], // ... every this many samples
-      values: [ () => { return () => { state.load(sampler.id).phase = sampler.getPhase(); } } ], // ... with a function that returns a function which the ontick method will invoke
-      shouldKeepOffset: true //TODO should i keep this?
-    });
+    // Disabled because it turns out we can meaningfully poll the phase via requestAnimationFrame
+    // var sequencer = new Gibberish.Sequencer({
+    //   target:sampler,    // attach to the sampler, 
+    //   key:'ontick',      // ... and invoke its ontick method
+    //   durations:[100], // ... every this many samples
+    //   values: [ () => { return () => { state.load(sampler.id).phase = sampler.getPhase(); } } ], // ... with a function that returns a function which the ontick method will invoke
+    //   shouldKeepOffset: true //TODO should i keep this?
+    // });
     
-    this.sequencer = sequencer;
+    // this.sequencer = sequencer;
     
   }
 
@@ -42,8 +43,9 @@ class GibberishSamplerSynth {
     this.sampler.setBuffer(samples);
     this.sampler.length = samples.length;
     //this.sampler.note(this.sampler.pitch);
-    if (!this.sequencer.isRunning)
-      this.sequencer.start();
+
+    // if (!this.sequencer.isRunning)
+    //   this.sequencer.start();
   }
 
   get wavetable() {
@@ -53,7 +55,7 @@ class GibberishSamplerSynth {
 
   set pitch(pitch) {
     this.sampler.pitch = pitch;
-    state.load(this.id).pitch = this.sampler.pitch;
+    state.load(this.id).pitch = pitch;
   }
 
   get pitch() {
@@ -109,37 +111,9 @@ class GibberishSamplerSynth {
 }
 
 
-function loadSynthParamsFromState(ids = [], params = ["amp","pitch","phase"]) {
-  ids.map( (id) => {
-    var stateI = state.load(id),
-	synthI = synths[id];
-
-    params.forEach( (param,i) => {
-      if (stateI[param]) synthI[param] = state[param];
-    });    
-  });
-}
-
-function synth(i, fn) {
-  fn(synths[i]);
-}
-
-function focusedSynth(fn) {
-  fn(synths[state.focus]);
-}
-
-function allSynths(fn) {
-  synths.map( (s,i) => fn(s) );
-}
-
-function allSynthsButFocused(fn) {
-  synths.map( (s,i) => { if (s.id != state.focus) fn(s); } );
-}
-
-
 synths = synths.map((e,i) => new GibberishSamplerSynth({id:i}));
 
-export default { synths, loadSynthParamsFromState, focusedSynth, allSynths, allSynthsButFocused, numSamples };
+export default { synths, numSamples };
 
     
 	

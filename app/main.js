@@ -22,8 +22,9 @@ window.availableDevices = availableDevices;
 import state from 'state';
 import gui from 'gui';
 import controls from 'controllers/cmd-lc1/controls';
-import audio from 'gibberish-audio';
-
+//BE-audio import audio from 'gibberish-audio';
+import audio from 'audio';
+window.audio = audio;
 window.state = state;
 // window.controls = controls;
 

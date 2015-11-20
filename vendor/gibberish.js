@@ -163,11 +163,11 @@ param **Audio Event** : Object. The HTML5 audio event object.
       
       if(me.isDirty) {
         _callback = me.createCallback();
-        try{
+        //BE//try{ //BE let's remove the try-catch so that this function can be optimized
           callback = me.callback = new Function( _callback[0], _callback[1] )
-        }catch( e ) {
-          console.error( "ERROR WITH CALLBACK : \n\n", _callback )
-        }
+        //BE//}catch( e ) {
+        //BE//  console.error( "ERROR WITH CALLBACK : \n\n", _callback )
+        //BE//}
         
         me.isDirty = false;
         objs = me.callbackObjects.slice(0)

@@ -96,6 +96,8 @@ function setIterations(itr, isdelta) {
   s.iterations = isdelta ? s.iterations + itr : itr;
   if (s.iterations > MAXITERATIONS) s.iterations = MAXITERATIONS;
   if (s.iterations < MINITERATIONS) s.iterations = MINITERATIONS;
+  //FIXME: hacky
+  s.numSamples = Math.pow(s.pattern.length, s.iterations);
   state.save(focused, s);
   controls[focused].iterations = s.iterations;
   gui.updateIterations(focused, s.iterations);

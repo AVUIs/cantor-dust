@@ -2,27 +2,16 @@
 
 import cantor from 'gui/cantor';
 import state  from 'state';
-
-var ORIGINAL_STYLE = {
-  withColours: true,
-  invertColours: false,
-  drawAllLevels: true,
-  drawScanLines: false
-}
-
-var STYLE = {
-  withColours: true,
-  invertColours: false,
-  drawAllLevels: true,
-  drawScanLines: true
-}
-
+//BE-audio import audio from 'gibberish-audio'
+import audio from 'audio'
+import config from 'config'
 
 var canvas = document.querySelector('canvas#fractal-layer'),
     ctx    = canvas.getContext('2d'),
     scannerCanvas = document.querySelector('canvas#scanner-layer'),
     scannerCtx = scannerCanvas.getContext('2d'),
-    segmentH = window.innerHeight / 8;
+    segmentH = window.innerHeight / 8,
+    STYLE = config.params.VISUALS.STYLE;
 
 
 function dim(i) {
@@ -75,39 +64,65 @@ function updateSliders(n, params) {
   }
 }
 
-function updateScanners() {
-  if (!STYLE.drawScanLines) 
+// http://jsfiddle.net/chicagogrooves/nRpVD/2/
+var fpsInterval = 1000 / config.params.VISUALS.FPS,
+    startTime = window.performance.now(),
+    then = startTime,
+    frameCount = 0;
+    //$osd = document.getElementById("osd"),
+
+
+function updateScanners(now) {
+  if (!config.params.VISUALS.drawScanLines) 
     return;
-  
-  var stateI,
-      i = 8;
 
-  //FIXME: because removing just the single mark doesn't work reliably
-  scannerCtx.clearRect(0,0,scannerCanvas.width, scannerCanvas.height);
-  
-  while(i--) {
-    stateI = state.load(i);
-    updateScanner(i,stateI);
-  }
-
+  // request another frame
   requestAnimationFrame(updateScanners);
+
+  var elapsed = now - then;
+
+  // if enough time has elapsed, draw the next frame
+  if (elapsed > fpsInterval) {
+
+    // Get ready for next frame by setting then=now, but...
+    // Also, adjust for fpsInterval not being multiple of 16.67
+    then = now - (elapsed % fpsInterval);
+    
+    // draw stuff here        
+    scannerCtx.fillStyle = 'white';        
+    state.getActiveStateIds().map( (i) => updateScanner(i));
+        
+    // TESTING...Report #seconds since start and achieved fps.
+    // var sinceStart = now - startTime;
+    // var currentFps = Math.round(1000 / (sinceStart / ++frameCount) * 100) / 100;
+    // $osd.innerHTML = "Elapsed time= " + Math.round(sinceStart / 1000 * 100) / 100 + " secs @ " + currentFps + " fps.";
+    
+  }
+  
 }
 
-function updateScanner(i,stateI) {
-  var dimI = dim(i);
-
-  //FIXME: this skips and misses some of the marks unfortunately -- disabling it, and using the
-  //fullscreen clearRect in updateScanners() above
-  if (false && stateI.lastphaseOnScreen !== undefined) {
-    scannerCtx.clearRect(stateI.lastphaseOnScreen, dimI.y, 1, dimI.h);
+function updateScanner(i) {
+  var dimI = dim(i),
+      stateI = state.load(i),
+      phaseI = audio.synths[i].phase;
+  
+  if (stateI.lastphaseOnScreen !== undefined) {
+    scannerCtx.clearRect(stateI.lastphaseOnScreen-1, dimI.y-1, 2, dimI.h+2);
   }
-
-  if (stateI.phase !== undefined) {
-    // we really shouldn't be doing this here at every update
-    var numSamples = Math.pow(stateI.pattern.length, stateI.iterations);
-    var phaseOnScreen = Math.round( (stateI.phase/numSamples) * dimI.w + dimI.x );
-    scannerCtx.fillStyle = 'white';
+  else { //fallback to clearing the whole segment
+    scannerCtx.clearRect(dimI.x, dimI.y, dimI.w, dimI.h);
+  }
+  
+  if (phaseI !== undefined) {
+    //FIXME: hacky
+    stateI.numSamples = stateI.numSamples || Math.pow(stateI.pattern.length,stateI.iterations);
+    
+    // Faster rounding: http://www.html5rocks.com/en/tutorials/canvas/performance/#toc-avoid-float
+    // var phaseOnScreen = Math.round( ((phaseI%stateI.numSamples)/stateI.numSamples) * dimI.w + dimI.x );
+    var phaseOnScreen = (0.5 + ((phaseI%stateI.numSamples)/stateI.numSamples) * dimI.w + dimI.x) | 0;
+    
     scannerCtx.fillRect(phaseOnScreen, dimI.y, 1, dimI.h);
+    stateI.phase = phaseI;
     stateI.lastphaseOnScreen = phaseOnScreen;
   }
 }

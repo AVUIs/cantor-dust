@@ -2,7 +2,9 @@ import controls   from 'controllers/cmd-lc1/controls';
 import gui    from 'gui';
 import state  from 'state';
 import player from 'player';
-import audio from 'gibberish-audio';
+//BE-audio import audio from 'gibberish-audio';
+import audio from 'audio'
+import config from 'config'
 
 function initKeyboard() {
 
@@ -118,7 +120,7 @@ function initKeyboard() {
 
   key('shift+s', () => state.saveToURL()); // state -> url
 
-  key('shift+l', () => { gui.STYLE.drawScanLines = !gui.STYLE.drawScanLines; gui.updateScanners() });
+  key('shift+l', () => { config.params.VISUALS.drawScanLines = !config.params.VISUALS.drawScanLines; gui.updateScanners() });
   
 }
 

@@ -1,77 +1,34 @@
 'use strict';
 
-var numSynths = 8,
-    audioCtxConstructor = (window.AudioContext || window.webkitAudioContext),
-    audioCtx   = new audioCtxConstructor(),
-    numSamples = Math.pow(2, 19),
-    synths     = Array.apply(null, { length: numSynths });
+import {synths,numSamples} from 'native-audio';
+//import {synths,numSamples} from 'gibberish-audio';
 
 
-class WavetableSynth {
-  constructor() {
-    var source = audioCtx.createBufferSource(),
-        buffer = audioCtx.createBuffer(2, numSamples, audioCtx.sampleRate);
-    var mutedvolume = undefined;
-    this.channels = {
-      left:  buffer.getChannelData(0),
-      right: buffer.getChannelData(1),
-    };
-    this.source = source;
-    this.gain = audioCtx.createGain();
-    source.playbackRate.value = 1 / 8;
-    source.loop   = true;
-    source.buffer = buffer;
-    source.connect(this.gain);
-    this.gain.connect(audioCtx.destination);
-    source.start();
-  }
+function loadSynthParamsFromState(ids = [], params = ["amp","pitch","phase"]) {
+  ids.map( (id) => {
+    var stateI = state.load(id),
+	synthI = synths[id];
 
-  set wavetable(samples) {
-    var numFrames = samples.length,
-        left  = this.channels.left,
-        right = this.channels.right,
-        len, i;
-
-    //console.log(numFrames /*2^14*/, left.length /*2^19*/);
-    
-    for (i = 0, len = left.length; i < len; i++) {
-      left[i]  = samples[i % numFrames];
-      right[i] = samples[i % numFrames];
-    }
-  }
-  get wavetable() {
-    return [this.channels.left, this.channels.right];
-  }
-
-  playRatechange(factor) {
-    var rate = this.source.playbackRate.value;
-    rate *= factor;
-    if (rate > 1)
-      rate = 1;
-    this.source.playbackRate.value = rate;
-    return rate;
-  }
-    
-  
-  set volume(value) {
-    this.gain.gain.value = value;
-  }
-  get volume() {
-    return this.gain.gain.value;
-  }
-  
-  togglemute() {
-    if (this.mutedvolume === undefined) {
-      this.mutedvolume = this.gain.gain.value;
-      this.gain.gain.value = 0.0;
-    }
-    else {
-      this.gain.gain.value = this.mutedvolume;
-      this.mutedvolume = undefined;
-    }      
-  }
+    params.forEach( (param,i) => {
+      if (stateI[param]) synthI[param] = state[param];
+    });    
+  });
 }
 
-synths = synths.map(() => new WavetableSynth());
+function synth(i, fn) {
+  return fn(synths[i]);
+}
 
-export default { synths, numSamples };
+function focusedSynth(fn) {
+  return fn(synths[state.focus]);
+}
+
+function allSynths(fn) {
+  return synths.map( (s,i) => fn(s) );
+}
+
+function allSynthsButFocused(fn) {
+  return synths.map( (s,i) => { if (s.id != state.focus) fn(s); } );
+}
+
+export default { synths, numSamples, loadSynthParamsFromState, focusedSynth, allSynths, allSynthsButFocused };
