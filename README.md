@@ -7,6 +7,12 @@ starting seed and number of iterations for a number of fractals at once, either
 through the graphical interface, or through an midi controller. The project is
 written in plain old Javascript, and runs entirely in a (modern) web browser.
 
+To get a taste, try this [sinister drone sound](http://avuis.github.io/cantor-dust/#STATE:%5B%7B%22iterations%22:7,%22pattern%22:%5B0.4099999999999999,0.8600000000000003,0.6200000000000001,0.5%5D,%22amp%22:4.000000000000001,%22pitch%22:0.015624999999999993,%22phase%22:9688.99075944447%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.8000000000000003,0.5%5D,%22amp%22:3.6000000000000007,%22pitch%22:0.011048543456039799,%22phase%22:13447.077559855532%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.19999999999999973,0.5%5D,%22amp%22:3.8000000000000008,%22pitch%22:0.0220970869120796,%22phase%22:6193.946044006462%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.8000000000000003,0.5%5D,%22amp%22:3.4000000000000006,%22pitch%22:0.015624999999999993,%22phase%22:10979.765624999998%7D%5D), or this [rich dance loop](http://avuis.github.io/cantor-dust/#STATE:%5B%7B%22iterations%22:7,%22pattern%22:%5B0.8300000000000003,0.5,0.3799999999999999,0.47%5D,%22amp%22:0,%22phase%22:2560%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.8900000000000003,0,0.2899999999999998,0%5D,%22amp%22:0,%22phase%22:2560%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.33000000000000007,0.7500000000000004,0.33000000000000007,0.33000000000000007%5D,%22amp%22:0,%22phase%22:2560%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.9200000000000004,0.43999999999999995,0.8000000000000003,0.31999999999999984%5D,%22amp%22:0,%22pitch%22:0.125,%22phase%22:2560%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.8600000000000003,0.3600000000000001,0.30000000000000004,0.56%5D,%22amp%22:0,%22phase%22:2560%7D,%7B%22iterations%22:7,%22pattern%22:%5B0,0.1399999999999998,0,0.5%5D,%22amp%22:0,%22phase%22:2560%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.09,0.2299999999999998,0.10999999999999979,0.31999999999999984%5D,%22amp%22:0,%22phase%22:2560%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.6200000000000001,0.31999999999999984,0.43999999999999995%5D,%22amp%22:0,%22pitch%22:0.49999999999999983,%22phase%22:10067.999999999998%7D%5D).
+
+(Make sure you have good headphones/speakers -- the more you stay with the sound, the more layers you will notice)
+
+And read the section on [keyboard controls](#keyboard-controls) below if you want to play with it yourself.
+
 ## About
 
 In the browser we functionally generate a Cantor Set fractal. With the final
@@ -127,9 +133,6 @@ Shift-L   Toggle scanlines off/on (if your machine struggles,
 ```
 Shift-S   Save overall state to URL (which you can copy, share, revisit, etc)
 ```
-
-For example, try this [deep sound](http://avuis.github.io/cantor-dust/#STATE:%5B%7B%22iterations%22:7,%22pattern%22:%5B0.4099999999999999,0.8600000000000003,0.6200000000000001,0.5%5D,%22amp%22:2.000000000000001,%22pitch%22:0.015624999999999993,%22phase%22:9688.99075944447%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.8000000000000003,0.5%5D,%22amp%22:1.8000000000000007,%22pitch%22:0.011048543456039799,%22phase%22:13447.077559855532%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.19999999999999973,0.5%5D,%22amp%22:1.9000000000000008,%22pitch%22:0.0220970869120796,%22phase%22:6193.946044006462%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.8000000000000003,0.5%5D,%22amp%22:1.7000000000000006,%22pitch%22:0.015624999999999993,%22phase%22:10979.765624999998%7D%5D)  (make sure you have good speakers/headphones)
-
 
 ## Notes
 
