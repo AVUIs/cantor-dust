@@ -2,7 +2,6 @@ import controls   from 'controllers/cmd-lc1/controls';
 import gui    from 'gui';
 import state  from 'state';
 import player from 'player';
-//BE-audio import audio from 'gibberish-audio';
 import audio from 'audio'
 import config from 'config'
 

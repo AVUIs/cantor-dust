@@ -130,6 +130,22 @@ Shift-S   Save overall state to URL (which you can copy, share, revisit, etc)
 
 For example, try this [deep sound](http://avuis.github.io/cantor-dust/#STATE:%5B%7B%22iterations%22:7,%22pattern%22:%5B0.4099999999999999,0.8600000000000003,0.6200000000000001,0.5%5D,%22amp%22:2.000000000000001,%22pitch%22:0.015624999999999993,%22phase%22:9688.99075944447%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.8000000000000003,0.5%5D,%22amp%22:1.8000000000000007,%22pitch%22:0.011048543456039799,%22phase%22:13447.077559855532%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.19999999999999973,0.5%5D,%22amp%22:1.9000000000000008,%22pitch%22:0.0220970869120796,%22phase%22:6193.946044006462%7D,%7B%22iterations%22:7,%22pattern%22:%5B0.5,0.5,0.8000000000000003,0.5%5D,%22amp%22:1.7000000000000006,%22pitch%22:0.015624999999999993,%22phase%22:10979.765624999998%7D%5D)  (make sure you have good speakers/headphones)
 
+
+## Notes
+
+There are in fact two working audio engines in the current implementation: the original based on native webaudio, and a new one based on gibberish.js.
+
+The original implementation doesn't support playback position reporting (ie no scanning lines) and can only run on google chrome because of the way it is implemented. However, it produces the better sound.
+
+The implementation based on gibberish.js runs on multiple browsers and provides playback position feedback. However, the sound quality needs more work.
+
+You can try them both:
+
+* [cantor-dust/original](http://avuis.github.io/cantor-dust/original)
+* [cantor-dust/gibberish](http://avuis.github.io/cantor-dust/)
+
+
+
 ## LICENCE
 
 ```

@@ -1,7 +1,9 @@
 'use strict';
 
-import {synths,numSamples} from 'native-audio';
-//import {synths,numSamples} from 'gibberish-audio';
+//import {synths,numSamples} from 'native-audio';
+import {synths,numSamples} from 'gibberish-audio';
+
+import state from 'state';
 
 
 function loadSynthParamsFromState(ids = [], params = ["amp","pitch","phase"]) {

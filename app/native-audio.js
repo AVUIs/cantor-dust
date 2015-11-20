@@ -1,5 +1,7 @@
 'use strict';
 
+import state from 'state';
+
 var numSynths = 8,
     audioCtxConstructor = (window.AudioContext || window.webkitAudioContext),
     audioCtx   = new audioCtxConstructor(),

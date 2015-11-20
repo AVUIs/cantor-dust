@@ -2,9 +2,8 @@
 
 import cantor from 'gui/cantor';
 import state  from 'state';
-//BE-audio import audio from 'gibberish-audio'
-import audio from 'audio'
-import config from 'config'
+import audio from 'audio';
+import config from 'config';
 
 var canvas = document.querySelector('canvas#fractal-layer'),
     ctx    = canvas.getContext('2d'),
