@@ -149,7 +149,11 @@ You can try them both:
 * [cantor-dust/original](http://avuis.github.io/cantor-dust/original)
 * [cantor-dust/gibberish](http://avuis.github.io/cantor-dust/)
 
+### Theme credits
 
+* [Solarized](http://ethanschoonover.com/solarized) by Ethan Schoonover
+* [Pantone - Color of the Year](http://www.pantone.com/pages/pantone.aspx?pg=21111&ca=90), [(2000-2015)](http://pantone.wikia.com/wiki/Category:Color_of_the_Year) by Pantone
+* [20th Century Color Palettes by Decade](http://procreate.si/forums/index.php?topic=4306.0;nowap) by [THagler](http://procreate.si/forums/index.php?action=profile;u=7355)
 
 ## LICENCE
 
