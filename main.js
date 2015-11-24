@@ -113,13 +113,14 @@ require.register("audio", function(exports, require, module) {
 'use strict';
 
 //import {synths,numSamples} from 'native-audio';
+//import {synths,numSamples} from 'gibberish-audio';
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _gibberishAudio = require('gibberish-audio');
+var _newAudio = require('new-audio');
 
 var _state = require('state');
 
@@ -131,7 +132,7 @@ function loadSynthParamsFromState() {
 
   ids.map(function (id) {
     var stateI = _state2['default'].load(id),
-        synthI = _gibberishAudio.synths[id];
+        synthI = _newAudio.synths[id];
 
     params.forEach(function (param, i) {
       if (stateI[param]) synthI[param] = stateI[param];
@@ -140,26 +141,26 @@ function loadSynthParamsFromState() {
 }
 
 function synth(i, fn) {
-  return fn(_gibberishAudio.synths[i]);
+  return fn(_newAudio.synths[i]);
 }
 
 function focusedSynth(fn) {
-  return fn(_gibberishAudio.synths[_state2['default'].focus]);
+  return fn(_newAudio.synths[_state2['default'].focus]);
 }
 
 function allSynths(fn) {
-  return _gibberishAudio.synths.map(function (s, i) {
+  return _newAudio.synths.map(function (s, i) {
     return fn(s);
   });
 }
 
 function allSynthsButFocused(fn) {
-  return _gibberishAudio.synths.map(function (s, i) {
+  return _newAudio.synths.map(function (s, i) {
     if (s.id != _state2['default'].focus) fn(s);
   });
 }
 
-exports['default'] = { synths: _gibberishAudio.synths, numSamples: _gibberishAudio.numSamples, loadSynthParamsFromState: loadSynthParamsFromState, focusedSynth: focusedSynth, allSynths: allSynths, allSynthsButFocused: allSynthsButFocused };
+exports['default'] = { synths: _newAudio.synths, numSamples: _newAudio.numSamples, loadSynthParamsFromState: loadSynthParamsFromState, focusedSynth: focusedSynth, allSynths: allSynths, allSynthsButFocused: allSynthsButFocused };
 module.exports = exports['default'];
 });
 
@@ -174,9 +175,10 @@ var params = {
     STYLE: {
       withColours: true,
       invertColours: false,
-      drawAllLevels: true
+      drawAllLevels: true,
+      drawLevelsTopDown: false
     },
-    drawScanLines: true,
+    drawScanLines: false,
     FPS: 40
   },
 
@@ -190,7 +192,8 @@ var original = {
     STYLE: {
       withColours: false,
       invertColours: false,
-      drawAllLevels: true
+      drawAllLevels: true,
+      drawLevelsTopDown: true
     },
     drawScanLines: false,
     FPS: 60
@@ -628,6 +631,10 @@ var _config = require('config');
 
 var _config2 = _interopRequireDefault(_config);
 
+var _guiThemes = require('gui/themes');
+
+var _guiThemes2 = _interopRequireDefault(_guiThemes);
+
 function initKeyboard() {
 
   _controllersCmdLc1Controls2['default'].init();
@@ -869,6 +876,10 @@ function initKeyboard() {
 
   key('shift+l', function () {
     _config2['default'].params.VISUALS.drawScanLines = !_config2['default'].params.VISUALS.drawScanLines;_gui2['default'].updateScanners();
+  });
+
+  key('shift+\\', function () {
+    _guiThemes2['default'].currentPalette = _guiThemes2['default'].nextPalette();document.title = "Cantor Dust :: " + _guiThemes2['default'].currentPalette.name;_gui2['default'].updateAll();
   });
 }
 
@@ -1257,6 +1268,10 @@ var _config = require('config');
 
 var _config2 = _interopRequireDefault(_config);
 
+var _guiThemes = require('gui/themes');
+
+var _guiThemes2 = _interopRequireDefault(_guiThemes);
+
 var canvas = document.querySelector('canvas#fractal-layer'),
     ctx = canvas.getContext('2d'),
     scannerCanvas = document.querySelector('canvas#scanner-layer'),
@@ -1316,30 +1331,41 @@ function updateSliders(n, params) {
 // http://jsfiddle.net/chicagogrooves/nRpVD/2/
 var fpsInterval = 1000 / _config2['default'].params.VISUALS.FPS,
     startTime = window.performance.now(),
-    then = startTime,
+    timeThen = startTime,
     frameCount = 0;
 //$osd = document.getElementById("osd"),
 
-function updateScanners(now) {
-  if (!_config2['default'].params.VISUALS.drawScanLines) return;
+function suspendScanners(truefalse) {
+  if (truefalse === true) {
+    _state2['default'].suspendScanners = true;
+  } else {
+    _state2['default'].suspendScanners = false;
+    updateScanners();
+  }
+}
+
+function updateScanners(timeNow) {
+  if (!_config2['default'].params.VISUALS.drawScanLines || _state2['default'].suspendScanners) return;
 
   // request another frame
   requestAnimationFrame(updateScanners);
 
-  var elapsed = now - then;
+  var elapsed = timeNow - timeThen;
 
   // if enough time has elapsed, draw the next frame
   if (elapsed > fpsInterval) {
 
     // Get ready for next frame by setting then=now, but...
     // Also, adjust for fpsInterval not being multiple of 16.67
-    then = now - elapsed % fpsInterval;
+    timeThen = timeNow - elapsed % fpsInterval;
 
     // draw stuff here       
     scannerCtx.fillStyle = 'white';
-    _state2['default'].getActiveStateIds().map(function (i) {
-      return updateScanner(i);
-    });
+
+    var activeStates = _state2['default'].getActiveStateIds();
+    for (var i = 0; i < activeStates.length; i++) {
+      updateScanner(activeStates[i]);
+    }
 
     // TESTING...Report #seconds since start and achieved fps.
     // var sinceStart = now - startTime;
@@ -1355,9 +1381,9 @@ function updateScanner(i) {
 
   if (stateI.lastphaseOnScreen !== undefined) {
     scannerCtx.clearRect(stateI.lastphaseOnScreen - 1, dimI.y - 1, 2, dimI.h + 2);
-  } else {
-    //fallback to clearing the whole segment
-    scannerCtx.clearRect(dimI.x, dimI.y, dimI.w, dimI.h);
+    stateI.lastphaseOnScreen = undefined;
+  } else {//fallback to clearing the whole segment?
+    // scannerCtx.clearRect(dimI.x, dimI.y, dimI.w, dimI.h);
   }
 
   if (phaseI !== undefined) {
@@ -1404,25 +1430,22 @@ resizeCanvas();
 
 updateScanners();
 
-exports['default'] = { updateCantor: updateCantor, updateIterations: updateIterations, updateSliders: updateSliders, updateScanners: updateScanners, STYLE: STYLE };
+exports['default'] = { updateCantor: updateCantor, updateIterations: updateIterations, updateSliders: updateSliders, updateScanners: updateScanners, suspendScanners: suspendScanners, updateAll: updateAll, STYLE: STYLE };
 module.exports = exports['default'];
 });
 
 require.register("gui/cantor", function(exports, require, module) {
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
 });
-var solarized = [[45, 100, 71], //yellow
-[18, 89, 80], //orange
-[1, 79, 86], //red
-[331, 74, 83], //magenta
-[237, 45, 77], //violet
-[205, 82, 82], //blue
-[175, 74, 63], //cyan
-[68, 100, 60] //green
-];
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _guiThemes = require('gui/themes');
+
+var _guiThemes2 = _interopRequireDefault(_guiThemes);
 
 function plotIteration(ctx, iteration, dimensions, STYLE) {
   if (typeof iteration === "undefined") return;
@@ -1435,6 +1458,8 @@ function plotIteration(ctx, iteration, dimensions, STYLE) {
       s,
       l;
 
+  var currentPalette = _guiThemes2['default'].currentPalette.palette;
+
   if (STYLE.withColours) while (i--) {
     // more fun
     // c = Math.round(360 * iteration[i]);
@@ -1446,16 +1471,17 @@ function plotIteration(ctx, iteration, dimensions, STYLE) {
 
     //solarized & accurate (we vary the lightness/brightness of the colours)
     c = Math.round(100 * iteration[i]);
-    h = solarized[dimensions.segmentId][0];
-    s = solarized[dimensions.segmentId][1];
-    ctx.fillStyle = "hsl(" + h + ", " + s + "%, " + c + "%)";
+    h = currentPalette[dimensions.segmentId][0];
+    s = currentPalette[dimensions.segmentId][1];
+    //if (STYLE.invertColours) c = 100-c;
+    ctx.fillStyle = 'hsl(' + h + ', ' + s + '%, ' + c + '%)';
 
     y = dimensions.y;
     ctx.fillRect(segmentW * i, y, segmentW, dimensions.h);
   } else while (i--) {
     c = Math.round(255 * iteration[i]);
     if (STYLE.invertColours) c = 255 - c;
-    ctx.fillStyle = "rgb(" + c + ", " + c + ", " + c + ")";
+    ctx.fillStyle = 'rgb(' + c + ', ' + c + ', ' + c + ')';
 
     y = dimensions.y;
     ctx.fillRect(segmentW * i, y, segmentW, dimensions.h);
@@ -1463,7 +1489,8 @@ function plotIteration(ctx, iteration, dimensions, STYLE) {
 }
 
 function plot(ctx, cantor, dimensions, STYLE) {
-  var i = Math.min(cantor.length, 8),
+  var numLevels = Math.min(cantor.length, 8),
+      i = numLevels,
       h = dimensions.h,
       dim;
 
@@ -1471,19 +1498,547 @@ function plot(ctx, cantor, dimensions, STYLE) {
     dim = Object.create(dimensions);
     plotIteration(ctx, cantor[i - 1], dim, STYLE);
   } else {
-    dimensions.h = h / i;
+    dimensions.h = h / numLevels;
 
     while (i--) {
       dim = Object.create(dimensions);
-      dim.y = dim.y + dim.h * i;
+      if (STYLE.drawLevelsTopDown) dim.y = dim.y + dim.h * i;else dim.y = dim.y + dim.h * (numLevels - i);
       dim.level = i;
       plotIteration(ctx, cantor[i - 1], dim, STYLE);
     }
   }
 }
 
-exports["default"] = { plot: plot };
+exports['default'] = { plot: plot };
+module.exports = exports['default'];
+});
+
+require.register("gui/palette/colors-by-decade", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+var _utils = require('utils');
+
+var Utils = _interopRequireWildcard(_utils);
+
+function transform_to_hsl(palette) {
+  var transformed = {};
+
+  Object.keys(palette).forEach(function (decade) {
+    var colours = palette[decade];
+    transformed[decade] = colours.map(function (hsb) {
+      return Utils.hsv_to_hsl(360 * hsb["hue"], hsb["saturation"], hsb["brightness"]);
+    });
+  });
+
+  return transformed;
+}
+
+var palette = {
+  "1900s": [{
+    "hue": 0.08333328,
+    "saturation": 0.2089552,
+    "brightness": 0.5254902
+  }, {
+    "hue": 0.1388889,
+    "saturation": 0.6875,
+    "brightness": 0.3764706
+  }, {
+    "hue": 0.1203704,
+    "saturation": 0.07792208,
+    "brightness": 0.9058824
+  }, {
+    "hue": 0.07246377,
+    "saturation": 0.1949152,
+    "brightness": 0.9254902
+  }, {
+    "hue": 0.06578946,
+    "saturation": 0.6867469,
+    "brightness": 0.6509804
+  }, {
+    "hue": 0.02927928,
+    "saturation": 0.4134078,
+    "brightness": 0.7019608
+  }, {
+    "hue": 0.517284,
+    "saturation": 1,
+    "brightness": 0.5294118
+  }, {
+    "hue": 0.3695652,
+    "saturation": 0.184,
+    "brightness": 0.4901961
+  }],
+  "1910s": [{
+    "hue": 0.1090225,
+    "saturation": 0.7916666,
+    "brightness": 0.6588235
+  }, {
+    "hue": 0.1512346,
+    "saturation": 0.2432432,
+    "brightness": 0.8705882
+  }, {
+    "hue": 0.1111111,
+    "saturation": 0.6195652,
+    "brightness": 0.3607843
+  }, {
+    "hue": 0.6780303,
+    "saturation": 0.34375,
+    "brightness": 0.5019608
+  }, {
+    "hue": 0.5407125,
+    "saturation": 1,
+    "brightness": 0.5137255
+  }, {
+    "hue": 0.2142857,
+    "saturation": 0.4336283,
+    "brightness": 0.4431373
+  }, {
+    "hue": 0.02141528,
+    "saturation": 0.7920354,
+    "brightness": 0.8862745
+  }, {
+    "hue": 0.5498084,
+    "saturation": 1,
+    "brightness": 0.3411765
+  }],
+  "1920s": [{
+    "hue": 0.07407407,
+    "saturation": 0.04736842,
+    "brightness": 0.7450981
+  }, {
+    "hue": 0.03030304,
+    "saturation": 0.34375,
+    "brightness": 0.3764706
+  }, {
+    "hue": 0.04964538,
+    "saturation": 0.5026738,
+    "brightness": 0.7333333
+  }, {
+    "hue": 0.9785478,
+    "saturation": 0.4879227,
+    "brightness": 0.8117647
+  }, {
+    "hue": 0.1134752,
+    "saturation": 0.5053763,
+    "brightness": 0.7294118
+  }, {
+    "hue": 0.25,
+    "saturation": 0.2368421,
+    "brightness": 0.5960785
+  }, {
+    "hue": 0.5729167,
+    "saturation": 0.6829268,
+    "brightness": 0.6431373
+  }, {
+    "hue": 0.9583333,
+    "saturation": 0.1142858,
+    "brightness": 0.1372549
+  }],
+  "1930s": [{
+    "hue": 0.5855856,
+    "saturation": 0.578125,
+    "brightness": 0.2509804
+  }, {
+    "hue": 0.1267056,
+    "saturation": 0.6705883,
+    "brightness": 1
+  }, {
+    "hue": 0.1195652,
+    "saturation": 0.9055118,
+    "brightness": 0.9960784
+  }, {
+    "hue": 0.9869685,
+    "saturation": 1,
+    "brightness": 0.9529412
+  }, {
+    "hue": 0.06814449,
+    "saturation": 0.8319672,
+    "brightness": 0.9568627
+  }, {
+    "hue": 0.4112903,
+    "saturation": 1,
+    "brightness": 0.4862745
+  }, {
+    "hue": 0.1111111,
+    "saturation": 0.6195652,
+    "brightness": 0.3607843
+  }, {
+    "hue": 0.7424242,
+    "saturation": 0.5,
+    "brightness": 0.5176471
+  }],
+  "1940s": [{
+    "hue": 0.4147727,
+    "saturation": 1,
+    "brightness": 0.6901961
+  }, {
+    "hue": 0.550505,
+    "saturation": 0.45,
+    "brightness": 0.8627451
+  }, {
+    "hue": 0.1529126,
+    "saturation": 0.8547718,
+    "brightness": 0.945098
+  }, {
+    "hue": 0.9866667,
+    "saturation": 0.952381,
+    "brightness": 0.8235294
+  }, {
+    "hue": 0.06696429,
+    "saturation": 0.4462151,
+    "brightness": 0.9843137
+  }, {
+    "hue": 0.4009662,
+    "saturation": 0.3382353,
+    "brightness": 0.8
+  }, {
+    "hue": 0.1349206,
+    "saturation": 0.1666667,
+    "brightness": 0.9882353
+  }, {
+    "hue": 0.06060606,
+    "saturation": 0.1973094,
+    "brightness": 0.8745098
+  }],
+  "1950s": [{
+    "hue": 0.1315359,
+    "saturation": 0.8395061,
+    "brightness": 0.9529412
+  }, {
+    "hue": 0.08553794,
+    "saturation": 0.7590362,
+    "brightness": 0.9764706
+  }, {
+    "hue": 0.1880631,
+    "saturation": 0.7668394,
+    "brightness": 0.7568628
+  }, {
+    "hue": 0.5,
+    "saturation": 0.03305785,
+    "brightness": 0.9490196
+  }, {
+    "hue": 0.5793651,
+    "saturation": 0.1858407,
+    "brightness": 0.4431373
+  }, {
+    "hue": 0.7192982,
+    "saturation": 0.3220339,
+    "brightness": 0.2313726
+  }, {
+    "hue": 0.4791667,
+    "saturation": 0.1818182,
+    "brightness": 0.6901961
+  }, {
+    "hue": 0.9866667,
+    "saturation": 0.09803921,
+    "brightness": 1
+  }, {
+    "hue": 0.5050505,
+    "saturation": 0.1563981,
+    "brightness": 0.827451
+  }, {
+    "hue": 0.1349206,
+    "saturation": 0.1666667,
+    "brightness": 0.9882353
+  }, {
+    "hue": 0.5815603,
+    "saturation": 0.2034632,
+    "brightness": 0.9058824
+  }, {
+    "hue": 0.07861635,
+    "saturation": 0.2086614,
+    "brightness": 0.9960784
+  }, {
+    "hue": 0.7878788,
+    "saturation": 0.04526749,
+    "brightness": 0.9529412
+  }, {
+    "hue": 0.9467593,
+    "saturation": 0.3333333,
+    "brightness": 0.8470588
+  }],
+  "1960s": [{
+    "hue": 0.1858974,
+    "saturation": 0.751445,
+    "brightness": 0.6784314
+  }, {
+    "hue": 0.1581699,
+    "saturation": 1,
+    "brightness": 1
+  }, {
+    "hue": 0.9645594,
+    "saturation": 0.9942857,
+    "brightness": 0.6862745
+  }, {
+    "hue": 0.07962963,
+    "saturation": 0.8035714,
+    "brightness": 0.8784314
+  }, {
+    "hue": 0.5673289,
+    "saturation": 1,
+    "brightness": 0.5921569
+  }, {
+    "hue": 0.9171123,
+    "saturation": 0.8461539,
+    "brightness": 0.8666667
+  }, {
+    "hue": 0.1645833,
+    "saturation": 0.8163264,
+    "brightness": 0.7686275
+  }, {
+    "hue": 0.7424242,
+    "saturation": 0.5,
+    "brightness": 0.5176471
+  }],
+  "1970s": [{
+    "hue": 0.5626667,
+    "saturation": 1,
+    "brightness": 0.4901961
+  }, {
+    "hue": 0.1818182,
+    "saturation": 0.2699386,
+    "brightness": 0.6392157
+  }, {
+    "hue": 0.1134752,
+    "saturation": 0.5053763,
+    "brightness": 0.7294118
+  }, {
+    "hue": 0.03030304,
+    "saturation": 0.34375,
+    "brightness": 0.3764706
+  }, {
+    "hue": 0.9862259,
+    "saturation": 0.7117647,
+    "brightness": 0.6666667
+  }, {
+    "hue": 0.08280256,
+    "saturation": 0.7548077,
+    "brightness": 0.8156863
+  }, {
+    "hue": 0.1309524,
+    "saturation": 0.7909604,
+    "brightness": 0.6941177
+  }, {
+    "hue": 0.1645022,
+    "saturation": 0.6637931,
+    "brightness": 0.454902
+  }],
+  "1980s": [{
+    "hue": 0.1742919,
+    "saturation": 0.7927461,
+    "brightness": 0.7568628
+  }, {
+    "hue": 0.5454546,
+    "saturation": 0.8571429,
+    "brightness": 0.9058824
+  }, {
+    "hue": 0.7342995,
+    "saturation": 0.3942857,
+    "brightness": 0.6862745
+  }, {
+    "hue": 0.9731182,
+    "saturation": 0.5123967,
+    "brightness": 0.9490196
+  }, {
+    "hue": 0.8651685,
+    "saturation": 0.4917127,
+    "brightness": 0.7098039
+  }, {
+    "hue": 0.4444444,
+    "saturation": 0.01463415,
+    "brightness": 0.8039216
+  }, {
+    "hue": 0.5749441,
+    "saturation": 1,
+    "brightness": 0.5843138
+  }, {
+    "hue": 0.9583333,
+    "saturation": 0.1142858,
+    "brightness": 0.1372549
+  }],
+  "1990s": [{
+    "hue": 0.1527778,
+    "saturation": 0.3348837,
+    "brightness": 0.8431373
+  }, {
+    "hue": 0.3937198,
+    "saturation": 0.4539474,
+    "brightness": 0.5960785
+  }, {
+    "hue": 0.2314815,
+    "saturation": 0.1978022,
+    "brightness": 0.7137255
+  }, {
+    "hue": 0.5447155,
+    "saturation": 0.1889401,
+    "brightness": 0.8509804
+  }, {
+    "hue": 0.5,
+    "saturation": 0.03305785,
+    "brightness": 0.9490196
+  }, {
+    "hue": 0.6238095,
+    "saturation": 0.3333333,
+    "brightness": 0.8235294
+  }, {
+    "hue": 0.9012821,
+    "saturation": 0.6666666,
+    "brightness": 0.7647059
+  }, {
+    "hue": 0.8282828,
+    "saturation": 0.5,
+    "brightness": 0.5176471
+  }],
+
+  "2000s": [{
+    "hue": 0.9791667,
+    "saturation": 0.75,
+    "brightness": 0.5019608
+  }, {
+    "hue": 0.06578946,
+    "saturation": 0.6867469,
+    "brightness": 0.6509804
+  }, {
+    "hue": 0.5498084,
+    "saturation": 1,
+    "brightness": 0.3411765
+  }, {
+    "hue": 0.1587302,
+    "saturation": 0.42,
+    "brightness": 0.1960784
+  }, {
+    "hue": 0.9944071,
+    "saturation": 0.8232045,
+    "brightness": 0.7098039
+  }, {
+    "hue": 0.5442891,
+    "saturation": 1,
+    "brightness": 0.5607843
+  }, {
+    "hue": 0.1563218,
+    "saturation": 0.8238636,
+    "brightness": 0.6901961
+  }, {
+    "hue": 0.1134752,
+    "saturation": 0.5053763,
+    "brightness": 0.7294118
+  }]
+};
+
+var palette = transform_to_hsl(palette);
+
+exports['default'] = { palette: palette };
+module.exports = exports['default'];
+});
+
+require.register("gui/palette/pantone-color-of-the-year", function(exports, require, module) {
+// http://blog.eliteemail.com/2013/01/03/pantone-color-of-the-year-2013/
+// http://colorizer.org/
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var palette = [hsl(237.6, 0, 296, 0.504), //blue izis, 2008
+hsl(42.3, 0.832, 0.625), //mimosa, 2009
+hsl(173.7, 0.455, 0.496), //turquoise, 2010
+hsl(343, 0.62, 0.576), //honeysuckle, 2011
+hsl(9.4, 0.731, 0.504), //tangerine tango, 2012
+hsl(166.1, 1.0, 0.304), //emerald, 2013
+hsl(310.8, 0.333, 0.541), //radiant orchid, 2014
+hsl(0.9, 0.296, 0.451) //marsala, 2015
+];
+
+function hsl(h, s, l) {
+  //return { "hue": h, "saturation": s, "lightness": l };
+  return [h, s * 100, l * 100];
+}
+
+exports["default"] = { palette: palette };
 module.exports = exports["default"];
+});
+
+require.register("gui/palette/solarized", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+var _utils = require('utils');
+
+var Utils = _interopRequireWildcard(_utils);
+
+var palette = [[45, 100, 71], //yellow
+[18, 89, 80], //orange
+[1, 79, 86], //red
+[331, 74, 83], //magenta
+[237, 45, 77], //violet
+[205, 82, 82], //blue
+[175, 74, 63], //cyan
+[68, 100, 60] //green
+];
+
+palette = palette.map(function (hsv) {
+  return Utils.hsv_to_hsl(hsv[0], hsv[1] / 100, hsv[2] / 100);
+});
+
+exports['default'] = { palette: palette };
+module.exports = exports['default'];
+});
+
+require.register("gui/themes", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _guiPaletteColorsByDecade = require('gui/palette/colors-by-decade');
+
+var _guiPaletteColorsByDecade2 = _interopRequireDefault(_guiPaletteColorsByDecade);
+
+var _guiPalettePantoneColorOfTheYear = require('gui/palette/pantone-color-of-the-year');
+
+var _guiPalettePantoneColorOfTheYear2 = _interopRequireDefault(_guiPalettePantoneColorOfTheYear);
+
+var _guiPaletteSolarized = require('gui/palette/solarized');
+
+var _guiPaletteSolarized2 = _interopRequireDefault(_guiPaletteSolarized);
+
+var _utils = require('utils');
+
+var palettes = {
+  "solarized": _guiPaletteSolarized2['default'].palette,
+  "pantone 2008-2015": _guiPalettePantoneColorOfTheYear2['default'].palette
+};
+Object.assign(palettes, _guiPaletteColorsByDecade2['default'].palette);
+
+var currentPalette = { name: "solarized", palette: _guiPaletteSolarized2['default'].palette };
+
+var nextPaletteName = (0, _utils.makeCircularGenerator)(Object.keys(palettes));
+
+function nextPalette() {
+  var name = nextPaletteName();
+
+  while (name === currentPalette.name) name = nextPaletteName();
+
+  currentPalette = { name: name, palette: palettes[name] };
+
+  return currentPalette;
+}
+
+exports['default'] = { palettes: palettes, nextPalette: nextPalette, currentPalette: currentPalette };
+module.exports = exports['default'];
 });
 
 require.register("main", function(exports, require, module) {
@@ -1745,6 +2300,199 @@ exports['default'] = { synths: synths, numSamples: numSamples };
 module.exports = exports['default'];
 });
 
+require.register("new-audio", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _state = require('state');
+
+var _state2 = _interopRequireDefault(_state);
+
+var numSynths = 8,
+    audioCtxConstructor = window.AudioContext || window.webkitAudioContext,
+    audioCtx = new audioCtxConstructor(),
+    numSamples = Math.pow(2, 19),
+    synths = Array.apply(null, { length: numSynths });
+
+function createBufferSource(audioCtx) {
+  var type = arguments.length <= 1 || arguments[1] === undefined ? "SPAudioBufferSourceNode" : arguments[1];
+
+  if (type === "SPAudioBufferSourceNode") {
+    return new SPAudioBufferSourceNode(audioCtx);
+  } else if (type === "AudioBufferSourceNode") {
+    return audioCtx.createBufferSource();
+  } else {
+    return audioCtx.createBufferSource();
+  }
+}
+
+function createBuffer(audioCtx, numSamplesOrSamplesArray) {
+  var numChannels = arguments.length <= 2 || arguments[2] === undefined ? 2 : arguments[2];
+  var sampleRate = arguments.length <= 3 || arguments[3] === undefined ? audioCtx.sampleRate : arguments[3];
+  return (function () {
+    if (typeof numSamplesOrSamplesArray === "number") {
+      return audioCtx.createBuffer(numChannels, numSamplesOrSamplesArray, sampleRate);
+    } else if (Array.isArray(numSamplesOrSamplesArray)) {
+      var samples = numSamplesOrSamplesArray,
+          numSamples = samples.length,
+          buffer = audioCtx.createBuffer(numChannels, numSamples, sampleRate),
+          channels = [];
+      for (var i = 0; i < numChannels; i++) {
+        channels[i] = buffer.getChannelData(i);
+      }
+      for (var j = 0; j < numSamples; j++) {
+        for (var i = 0; i < numChannels; i++) {
+          channels[i][j] = samples[j];
+        }
+      }
+      return buffer;
+    } else {
+      return null;
+    }
+  })();
+}
+
+var WavetableSynth = (function () {
+  function WavetableSynth(options) {
+    _classCallCheck(this, WavetableSynth);
+
+    // forward compatilibity
+    this.id = options.id;
+    this.bufferSourceNodeType = options.bufferSourceNodeType || "AudioBufferSourceNode";
+
+    var source = createBufferSource(audioCtx, this.bufferSourceNodeType),
+        buffer = createBuffer(audioCtx, numSamples, 2, audioCtx.sampleRate);
+
+    this.source = source;
+    source.buffer = buffer;
+    source.loop = true;
+    source.playbackRate.value = 1 / 8;
+
+    this.gain = audioCtx.createGain();
+    source.connect(this.gain);
+    this.gain.connect(audioCtx.destination);
+    this.mutedvolume = undefined;
+
+    source.start();
+  }
+
+  _createClass(WavetableSynth, [{
+    key: 'playRatechange',
+    value: function playRatechange(factor) {
+      var rate = this.source.playbackRate.value;
+      rate *= factor;
+      // if (rate > 1)
+      //   rate = 1;
+      this.source.playbackRate.value = rate;
+      _state2['default'].load(this.id).pitch = rate;
+      return rate;
+    }
+
+    // forward compatibility
+  }, {
+    key: 'togglemute',
+    value: function togglemute() {
+      if (this.mutedvolume === undefined) {
+        this.mutedvolume = this.gain.gain.value;
+        this.gain.gain.value = 0.0;
+      } else {
+        this.gain.gain.value = this.mutedvolume;
+        this.mutedvolume = undefined;
+      }
+    }
+
+    // forward compatilibity
+  }, {
+    key: 'wavetable',
+    set: function set(samples) {
+      if (this.source) this.source.disconnect();
+
+      var source = createBufferSource(audioCtx, this.bufferSourceNodeType);
+
+      if (samples instanceof AudioBuffer) {
+        source.buffer = samples;
+      } else if (Array.isArray(samples)) {
+        source.buffer = createBuffer(audioCtx, samples, 2, audioCtx.sampleRate);
+      } else {
+        source.buffer = this.source.buffer;
+      }
+
+      source.loop = this.source.loop;
+      source.playbackRate.value = this.source.playbackRate.value;
+      if (source.playbackPosition && this.source.playbackPosition) source.playbackPosition = this.source.playbackPosition;
+
+      source.connect(this.gain);
+
+      this.source = source;
+
+      source.start();
+    },
+    get: function get() {
+      var buffer = this.source.buffer;
+      return [buffer.getChannelData(0), buffer.getChannelData(1)];
+    }
+
+    // forward compatibility
+  }, {
+    key: 'pitch',
+    set: function set(pitch) {
+      this.source.playbackRate.value = pitch;
+      _state2['default'].load(this.id).pitch = pitch;
+    },
+
+    // forward compatibility
+    get: function get() {
+      return this.source.playbackRate;
+    }
+  }, {
+    key: 'amp',
+    set: function set(value) {
+      this.volume = value;
+      _state2['default'].load(this.id).amp = value;
+    },
+
+    // forward compatibility
+    get: function get() {
+      return this.volume;
+    }
+  }, {
+    key: 'volume',
+    set: function set(value) {
+      this.gain.gain.value = value;
+    },
+    get: function get() {
+      return this.gain.gain.value;
+    }
+  }, {
+    key: 'phase',
+    set: function set(phase) {
+      this.wavetable = this.source.buffer;
+    },
+    get: function get() {
+      return this.source.playbackPosition || "undefined";
+    }
+  }]);
+
+  return WavetableSynth;
+})();
+
+synths = synths.map(function (e, i) {
+  return new WavetableSynth({ id: i });
+});
+
+exports['default'] = { synths: synths, numSamples: numSamples };
+module.exports = exports['default'];
+});
+
 require.register("player", function(exports, require, module) {
 'use strict';
 
@@ -1923,6 +2671,45 @@ function getActiveStateIds() {
 
 exports["default"] = { save: save, load: load, focus: focus, copytobuffer: copytobuffer, savefrombuffer: savefrombuffer, toJSON: toJSON, setFromJSON: setFromJSON, saveToURL: saveToURL, loadFromURL: loadFromURL, getActiveStateIds: getActiveStateIds };
 module.exports = exports["default"];
+});
+
+require.register("utils", function(exports, require, module) {
+'use strict';
+
+// http://stackoverflow.com/questions/3423214/convert-hsb-hsv-color-to-hsl
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+exports.hsv_to_hsl = hsv_to_hsl;
+exports.makeCircularGenerator = makeCircularGenerator;
+
+function hsv_to_hsl(h, s, v) {
+    var asPercentages = arguments.length <= 3 || arguments[3] === undefined ? true : arguments[3];
+
+    // both hsv and hsl values are in [0, 1]
+    var l = (2 - s) * v / 2;
+
+    if (l != 0) {
+        if (l == 1) {
+            s = 0;
+        } else if (l < 0.5) {
+            s = s * v / (l * 2);
+        } else {
+            s = s * v / (2 - l * 2);
+        }
+    }
+
+    if (asPercentages) return [h, s * 100, l * 100];else return [h, s, l];
+}
+
+function makeCircularGenerator(array) {
+    var nextIndex = 0;
+    return function () {
+        return array[nextIndex++ % array.length];
+    };
+}
+
+//export default { hsv_to_hsl };
 });
 
 

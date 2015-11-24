@@ -12264,5 +12264,786 @@ return Gibberish;
 
 })(this);
 
+/*! loglevel - v1.4.0 - https://github.com/pimterry/loglevel - (c) 2015 Tim Perry - licensed MIT */
+(function (root, definition) {
+    "use strict";
+    if (typeof module === 'object' && module.exports && typeof require === 'function') {
+        module.exports = definition();
+    } else if (typeof define === 'function' && typeof define.amd === 'object') {
+        define(definition);
+    } else {
+        root.log = definition();
+    }
+}(this, function () {
+    "use strict";
+    var noop = function() {};
+    var undefinedType = "undefined";
+
+    function realMethod(methodName) {
+        if (typeof console === undefinedType) {
+            return false; // We can't build a real method without a console to log to
+        } else if (console[methodName] !== undefined) {
+            return bindMethod(console, methodName);
+        } else if (console.log !== undefined) {
+            return bindMethod(console, 'log');
+        } else {
+            return noop;
+        }
+    }
+
+    function bindMethod(obj, methodName) {
+        var method = obj[methodName];
+        if (typeof method.bind === 'function') {
+            return method.bind(obj);
+        } else {
+            try {
+                return Function.prototype.bind.call(method, obj);
+            } catch (e) {
+                // Missing bind shim or IE8 + Modernizr, fallback to wrapping
+                return function() {
+                    return Function.prototype.apply.apply(method, [obj, arguments]);
+                };
+            }
+        }
+    }
+
+    // these private functions always need `this` to be set properly
+
+    function enableLoggingWhenConsoleArrives(methodName, level, loggerName) {
+        return function () {
+            if (typeof console !== undefinedType) {
+                replaceLoggingMethods.call(this, level, loggerName);
+                this[methodName].apply(this, arguments);
+            }
+        };
+    }
+
+    function replaceLoggingMethods(level, loggerName) {
+        /*jshint validthis:true */
+        for (var i = 0; i < logMethods.length; i++) {
+            var methodName = logMethods[i];
+            this[methodName] = (i < level) ?
+                noop :
+                this.methodFactory(methodName, level, loggerName);
+        }
+    }
+
+    function defaultMethodFactory(methodName, level, loggerName) {
+        /*jshint validthis:true */
+        return realMethod(methodName) ||
+               enableLoggingWhenConsoleArrives.apply(this, arguments);
+    }
+
+    var logMethods = [
+        "trace",
+        "debug",
+        "info",
+        "warn",
+        "error"
+    ];
+
+    function Logger(name, defaultLevel, factory) {
+      var self = this;
+      var currentLevel;
+      var storageKey = "loglevel";
+      if (name) {
+        storageKey += ":" + name;
+      }
+
+      function persistLevelIfPossible(levelNum) {
+          var levelName = (logMethods[levelNum] || 'silent').toUpperCase();
+
+          // Use localStorage if available
+          try {
+              window.localStorage[storageKey] = levelName;
+              return;
+          } catch (ignore) {}
+
+          // Use session cookie as fallback
+          try {
+              window.document.cookie =
+                encodeURIComponent(storageKey) + "=" + levelName + ";";
+          } catch (ignore) {}
+      }
+
+      function getPersistedLevel() {
+          var storedLevel;
+
+          try {
+              storedLevel = window.localStorage[storageKey];
+          } catch (ignore) {}
+
+          if (typeof storedLevel === undefinedType) {
+              try {
+                  var cookie = window.document.cookie;
+                  var location = cookie.indexOf(
+                      encodeURIComponent(storageKey) + "=");
+                  if (location) {
+                      storedLevel = /^([^;]+)/.exec(cookie.slice(location))[1];
+                  }
+              } catch (ignore) {}
+          }
+
+          // If the stored level is not valid, treat it as if nothing was stored.
+          if (self.levels[storedLevel] === undefined) {
+              storedLevel = undefined;
+          }
+
+          return storedLevel;
+      }
+
+      /*
+       *
+       * Public API
+       *
+       */
+
+      self.levels = { "TRACE": 0, "DEBUG": 1, "INFO": 2, "WARN": 3,
+          "ERROR": 4, "SILENT": 5};
+
+      self.methodFactory = factory || defaultMethodFactory;
+
+      self.getLevel = function () {
+          return currentLevel;
+      };
+
+      self.setLevel = function (level, persist) {
+          if (typeof level === "string" && self.levels[level.toUpperCase()] !== undefined) {
+              level = self.levels[level.toUpperCase()];
+          }
+          if (typeof level === "number" && level >= 0 && level <= self.levels.SILENT) {
+              currentLevel = level;
+              if (persist !== false) {  // defaults to true
+                  persistLevelIfPossible(level);
+              }
+              replaceLoggingMethods.call(self, level, name);
+              if (typeof console === undefinedType && level < self.levels.SILENT) {
+                  return "No console available for logging";
+              }
+          } else {
+              throw "log.setLevel() called with invalid level: " + level;
+          }
+      };
+
+      self.setDefaultLevel = function (level) {
+          if (!getPersistedLevel()) {
+              self.setLevel(level, false);
+          }
+      };
+
+      self.enableAll = function(persist) {
+          self.setLevel(self.levels.TRACE, persist);
+      };
+
+      self.disableAll = function(persist) {
+          self.setLevel(self.levels.SILENT, persist);
+      };
+
+      // Initialize with the right level
+      var initialLevel = getPersistedLevel();
+      if (initialLevel == null) {
+          initialLevel = defaultLevel == null ? "WARN" : defaultLevel;
+      }
+      self.setLevel(initialLevel, false);
+    }
+
+    /*
+     *
+     * Package-level API
+     *
+     */
+
+    var defaultLogger = new Logger();
+
+    var _loggersByName = {};
+    defaultLogger.getLogger = function getLogger(name) {
+        if (typeof name !== "string" || name === "") {
+          throw new TypeError("You must supply a name when creating a logger.");
+        }
+
+        var logger = _loggersByName[name];
+        if (!logger) {
+          logger = _loggersByName[name] = new Logger(
+            name, defaultLogger.getLevel(), defaultLogger.methodFactory);
+        }
+        return logger;
+    };
+
+    // Grab the current global log variable in case of overwrite
+    var _log = (typeof window !== undefinedType) ? window.log : undefined;
+    defaultLogger.noConflict = function() {
+        if (typeof window !== undefinedType &&
+               window.log === defaultLogger) {
+            window.log = _log;
+        }
+
+        return defaultLogger;
+    };
+
+    return defaultLogger;
+}));
+
+/* BE
+   https://github.com/Sonoport/soundmodels
+   cd src/lib/core
+   cat AudioContextMonkeyPatch.js WebAudioDispatch.js Config.js SPPlaybackRateParam.js SPAudioBufferSourceNode.js > sonoport-soundmodels-core-lite.js
+*/
+
+/**
+ *
+ *
+ * @module Core
+ *
+ */
+"use strict";
+
+/*
+ * A structure for static configuration options.
+ *
+ * @module Core
+ * @class Config
+ */
+"use strict";
+
+function Config() {}
+
+/**
+ * Define if Errors are logged using errorception.
+ *
+ * @final
+ * @static
+ * @property LOG_ERRORS
+ * @default true
+ *
+ */
+Config.LOG_ERRORS = true;
+
+/**
+ * Very small number considered non-zero by WebAudio.
+ *
+ * @final
+ * @static
+ * @property ZERO
+ * @default 1e-37
+ *
+ */
+Config.ZERO = parseFloat( '1e-37' );
+
+/**
+ * Maximum number of voices supported
+ *
+ * @final
+ * @static
+ * @property MAX_VOICES
+ * @default 8
+ *
+ */
+Config.MAX_VOICES = 8;
+
+/**
+ * Default nominal refresh rate (Hz) for SoundQueue.
+ *
+ * @final
+ * @static
+ * @property NOMINAL_REFRESH_RATE
+ * @default 60
+ *
+ */
+Config.NOMINAL_REFRESH_RATE = 60;
+
+/**
+ * Default window length for window and add functionality
+ *
+ * @final
+ * @static
+ * @property NOMINAL_REFRESH_RATE
+ * @default 512
+ *
+ */
+Config.WINDOW_LENGTH = 512;
+
+/**
+ * Default Chunk Length for ScriptNodes.
+ *
+ * @final
+ * @static
+ * @property CHUNK_LENGTH
+ * @default 256
+ *
+ */
+Config.CHUNK_LENGTH = 2048;
+
+/**
+ * Default smoothing constant.
+ *
+ * @final
+ * @static
+ * @property CHUNK_LENGTH
+ * @default 0.05
+ *
+ */
+Config.DEFAULT_SMOOTHING_CONSTANT = 0.05;
+
+//BE module.exports = Config;
+/**
+ * @module Core
+ */
+"use strict";
+//BE var Config = require( '../core/Config' );
+
+/**
+ * Wrapper around AudioParam playbackRate of SPAudioBufferSourceNode to help calculate the playbackPosition of the AudioBufferSourceNode.
+ *
+ * @class SPPlaybackRateParam
+ * @constructor
+ * @param {SPAudioBufferSourceNode} bufferSourceNode Reference to the parent SPAudioBufferSourceNode.
+ * @param {AudioParam} audioParam The playbackRate of a source AudioBufferSourceNode.
+ * @param {AudioParam} counterParam The playbackRate of counter AudioBufferSourceNode.
+ */
+function SPPlaybackRateParam( bufferSourceNode, audioParam, counterParam ) {
+    this.defaultValue = audioParam.defaultValue;
+    this.maxValue = audioParam.maxValue;
+    this.minValue = audioParam.minValue;
+    this.name = audioParam.name;
+    this.units = audioParam.units;
+    this.isSPPlaybackRateParam = true;
+
+    Object.defineProperty( this, 'value', {
+        enumerable: true,
+        configurable: false,
+        set: function ( rate ) {
+            if ( bufferSourceNode.playbackState === bufferSourceNode.PLAYING_STATE ) {
+                audioParam.setTargetAtTime( rate, bufferSourceNode.audioContext.currentTime, Config.DEFAULT_SMOOTHING_CONSTANT );
+                counterParam.setTargetAtTime( rate, bufferSourceNode.audioContext.currentTime, Config.DEFAULT_SMOOTHING_CONSTANT );
+            } else {
+                audioParam.setValueAtTime( rate, bufferSourceNode.audioContext.currentTime );
+                counterParam.setValueAtTime( rate, bufferSourceNode.audioContext.currentTime );
+            }
+
+        },
+        get: function () {
+            return audioParam.value;
+        }
+    } );
+
+    audioParam.value = audioParam.value;
+    counterParam.value = audioParam.value;
+
+    this.linearRampToValueAtTime = function ( value, endTime ) {
+        audioParam.linearRampToValueAtTime( value, endTime );
+        counterParam.linearRampToValueAtTime( value, endTime );
+    };
+
+    this.exponentialRampToValueAtTime = function ( value, endTime ) {
+        audioParam.exponentialRampToValueAtTime( value, endTime );
+        counterParam.exponentialRampToValueAtTime( value, endTime );
+
+    };
+
+    this.setValueCurveAtTime = function ( values, startTime, duration ) {
+        audioParam.setValueCurveAtTime( values, startTime, duration );
+        counterParam.setValueCurveAtTime( values, startTime, duration );
+    };
+
+    this.setTargetAtTime = function ( target, startTime, timeConstant ) {
+        audioParam.setTargetAtTime( target, startTime, timeConstant );
+        counterParam.setTargetAtTime( target, startTime, timeConstant );
+
+    };
+
+    this.setValueAtTime = function ( value, time ) {
+        audioParam.setValueAtTime( value, time );
+        counterParam.setValueAtTime( value, time );
+    };
+
+    this.cancelScheduledValues = function ( time ) {
+        audioParam.cancelScheduledValues( time );
+        counterParam.cancelScheduledValues( time );
+    };
+}
+//BE module.exports = SPPlaybackRateParam;
+/**
+ * @module Core
+ */
+
+"use strict";
+//BE var SPPlaybackRateParam = require( '../core/SPPlaybackRateParam' );
+//BE var webAudioDispatch = require( '../core/WebAudioDispatch' );
+//BE var log = require( 'loglevel' );
+
+/**
+ * A wrapper around the AudioBufferSourceNode to be able to track the current playPosition of a AudioBufferSourceNode.
+ *
+ * @class SPAudioBufferSourceNode
+ * @constructor
+ * @param {AudioContext} AudioContext to be used in timing the parameter automation events
+ */
+function SPAudioBufferSourceNode( audioContext ) {
+    var bufferSourceNode_ = audioContext.createBufferSource();
+    var counterNode_;
+
+    var scopeNode_ = audioContext.createScriptProcessor( 256, 1, 1 );
+    var trackGainNode_ = audioContext.createGain();
+    var lastPos = 0;
+
+    this.audioContext = audioContext;
+    this.playbackState = 0;
+
+    this.channelCount = null;
+    this.channelCountMode = null;
+    this.channelInterpretation = null;
+    this.numberOfInputs = null;
+    this.numberOfOutputs = null;
+
+    /**
+     * Playback States Constant.
+     *
+     * @property UNSCHEDULED_STATE
+     * @type Number
+     * @default "Model"
+     **/
+    this.UNSCHEDULED_STATE = 0;
+
+    /**
+     * Playback States Constant.
+     *
+     * @property SCHEDULED_STATE
+     * @type Number
+     * @default "1"
+     **/
+    this.SCHEDULED_STATE = 1;
+
+    /**
+     * Playback States Constant.
+     *
+     * @property PLAYING_STATE
+     * @type Number
+     * @default "2"
+     **/
+    this.PLAYING_STATE = 2;
+
+    /**
+     * Playback States Constant.
+     *
+     * @property FINISHED_STATE
+     * @type Number
+     * @default "3"
+     **/
+    this.FINISHED_STATE = 3;
+
+    /**
+     * The speed at which to render the audio stream. Its default value is 1. This parameter is a-rate.
+     *
+     * @property playbackRate
+     * @type AudioParam
+     * @default 1
+     *
+     */
+    this.playbackRate = null;
+
+    /**
+     * An optional value in seconds where looping should end if the loop attribute is true.
+     *
+     * @property loopEnd
+     * @type Number
+     * @default 0
+     *
+     */
+    Object.defineProperty( this, 'loopEnd', {
+        enumerable: true,
+        configurable: false,
+        set: function ( loopEnd ) {
+            bufferSourceNode_.loopEnd = loopEnd;
+            counterNode_.loopEnd = loopEnd;
+        },
+        get: function () {
+            return bufferSourceNode_.loopEnd;
+        }
+    } );
+
+    /**
+     * An optional value in seconds where looping should begin if the loop attribute is true.
+     *
+     * @property loopStart
+     * @type Number
+     * @default 0
+     *
+     */
+    Object.defineProperty( this, 'loopStart', {
+        enumerable: true,
+        configurable: false,
+        set: function ( loopStart ) {
+            bufferSourceNode_.loopStart = loopStart;
+            counterNode_.loopStart = loopStart;
+        },
+        get: function () {
+            return bufferSourceNode_.loopStart;
+        }
+    } );
+
+    /**
+     * A property used to set the EventHandler for the ended event that is dispatched to AudioBufferSourceNode node types
+     *
+     * @property onended
+     * @type Function
+     * @default null
+     *
+     */
+    Object.defineProperty( this, 'onended', {
+        enumerable: true,
+        configurable: false,
+        set: function ( onended ) {
+            bufferSourceNode_.onended = wrapAroundOnEnded( this, onended );
+        },
+        get: function () {
+            return bufferSourceNode_.onended;
+        }
+    } );
+
+    /**
+     * Indicates if the audio data should play in a loop.
+     *
+     * @property loop
+     * @type Boolean
+     * @default false
+     *
+     */
+    Object.defineProperty( this, 'loop', {
+        enumerable: true,
+        configurable: false,
+        set: function ( loop ) {
+            bufferSourceNode_.loop = loop;
+            counterNode_.loop = loop;
+        },
+        get: function () {
+            return bufferSourceNode_.loop;
+        }
+    } );
+
+    /**
+     * Position (in seconds) of the last frame played back by the AudioContext
+     *
+     * @property playbackPosition
+     * @type Number
+     * @default 0
+     *
+     */
+    Object.defineProperty( this, 'playbackPosition', {
+        enumerable: true,
+        configurable: false,
+        get: function () {
+            return lastPos;
+        }
+    } );
+
+    /**
+     * Represents the audio asset to be played.
+     *
+     * @property buffer
+     * @type AudioBuffer
+     * @default null
+     *
+     */
+    Object.defineProperty( this, 'buffer', {
+        enumerable: true,
+        configurable: false,
+        set: function ( buffer ) {
+            if ( bufferSourceNode_ ) {
+                bufferSourceNode_.disconnect();
+            }
+
+            if ( counterNode_ ) {
+                counterNode_.disconnect();
+            }
+
+            bufferSourceNode_ = audioContext.createBufferSource();
+            counterNode_ = audioContext.createBufferSource();
+            if ( buffer.isSPAudioBuffer ) {
+                bufferSourceNode_.buffer = buffer.buffer;
+                counterNode_.buffer = createCounterBuffer( buffer.buffer );
+            } else if ( buffer instanceof AudioBuffer ) {
+                bufferSourceNode_.buffer = buffer;
+                counterNode_.buffer = createCounterBuffer( buffer );
+            }
+
+            counterNode_.connect( scopeNode_ );
+            bufferSourceNode_.connect( trackGainNode_ );
+
+            this.channelCount = bufferSourceNode_.channelCount;
+            this.channelCountMode = bufferSourceNode_.channelCountMode;
+            this.channelInterpretation = bufferSourceNode_.channelInterpretation;
+            this.numberOfInputs = bufferSourceNode_.numberOfInputs;
+            this.numberOfOutputs = bufferSourceNode_.numberOfOutputs;
+
+          this.playbackRate = new SPPlaybackRateParam( this, bufferSourceNode_.playbackRate, counterNode_.playbackRate );
+        },
+      get: function () {
+	//console.log("get: ", bufferSourceNode_.buffer);
+            return bufferSourceNode_.buffer;
+        }
+    } );
+
+    /**
+     * Track gain for this specific buffer.
+     *
+     * @property buffer
+     * @type AudioBuffer
+     * @default null
+     *
+     */
+    Object.defineProperty( this, 'gain', {
+        enumerable: true,
+        configurable: false,
+        set: function(gain) { //BE
+  	    trackGainNode_.gain.value = gain;
+	}, 
+        get: function () {
+            return trackGainNode_.gain;
+        }
+    } );
+
+    /**
+     * Connects the AudioNode to the input of another AudioNode.
+     *
+     * @method connect
+     * @param {AudioNode} destination AudioNode to connect to.
+     * @param {Number} [output] Index describing which output of the AudioNode from which to connect.
+     * @param {Number} [input] Index describing which input of the destination AudioNode to connect to.
+     *
+     */
+    this.connect = function ( destination, output, input ) {
+        trackGainNode_.connect( destination, output, input );
+    };
+
+    /**
+     * Disconnects the AudioNode from the input of another AudioNode.
+     *
+     * @method disconnect
+     * @param {Number} [output] Index describing which output of the AudioNode to disconnect.
+     *
+     */
+    this.disconnect = function ( output ) {
+        trackGainNode_.disconnect( output );
+    };
+
+    /**
+     * Start playback //BE
+     *
+     * @method start
+     *
+     */
+    this.start = function () {
+      bufferSourceNode_.start( );
+      counterNode_.start();
+      this.playbackState = this.PLAYING_STATE;
+    };
+
+    /**
+     * Stop playback //BE
+     *
+     * @method stop
+     *
+     */
+    this.stop = function () {
+        if ( this.playbackState === this.PLAYING_STATE || this.playbackState === this.SCHEDULED_STATE ) {
+            bufferSourceNode_.stop();
+            counterNode_.stop();
+        }
+    };
+
+    /**
+     * Resets the SP Buffer Source with a fresh BufferSource.
+     *
+     * @method resetBufferSource
+     * @param {Number} when Time (in seconds) when the Buffer source should be reset.
+     * @param {AudioNode} output The output to which the BufferSource is to be connected.
+     *
+     */
+    this.resetBufferSource = function ( when, output ) {
+
+        var self = this;
+        webAudioDispatch( function () {
+            //BE log.debug( 'Resetting BufferSource', self.buffer.length );
+            // Disconnect source(s) from output.
+
+            // Disconnect scope node from trackGain
+            scopeNode_.disconnect();
+
+            var newTrackGain = self.audioContext.createGain();
+            newTrackGain.gain.value = trackGainNode_.gain.value;
+            trackGainNode_ = newTrackGain;
+
+            // Create new sources and copy all the parameters over.
+            var newSource = self.audioContext.createBufferSource();
+            newSource.buffer = bufferSourceNode_.buffer;
+            newSource.loopStart = bufferSourceNode_.loopStart;
+            newSource.loopEnd = bufferSourceNode_.loopEnd;
+            newSource.onended = wrapAroundOnEnded( self, bufferSourceNode_.onended );
+
+            // Remove onended callback from old buffer
+            bufferSourceNode_.onended = null;
+
+            // Throw away the counter node;
+            counterNode_.disconnect();
+
+            var newCounterNode = audioContext.createBufferSource();
+            newCounterNode.buffer = counterNode_.buffer;
+
+            // Assign the new local variables to new sources
+            bufferSourceNode_ = newSource;
+            counterNode_ = newCounterNode;
+
+            // Create new parameters for rate parameter
+            var playBackRateVal = self.playbackRate.value;
+            self.playbackRate = new SPPlaybackRateParam( self, bufferSourceNode_.playbackRate, counterNode_.playbackRate );
+            self.playbackRate.setValueAtTime( playBackRateVal, 0 );
+
+            // Reconnect to output.
+            counterNode_.connect( scopeNode_ );
+            bufferSourceNode_.connect( trackGainNode_ );
+            scopeNode_.connect( trackGainNode_ );
+            self.connect( output );
+            self.playbackState = self.UNSCHEDULED_STATE;
+        }, when, this.audioContext );
+    };
+
+    // Private Methods
+
+    function createCounterBuffer( buffer ) {
+        var array = new Float32Array( buffer.length );
+        var audioBuf = audioContext.createBuffer( 1, buffer.length, 44100 );
+
+        for ( var index = 0; index < buffer.length; index++ ) {
+            array[ index ] = index;
+        }
+
+        audioBuf.getChannelData( 0 ).set( array );
+        return audioBuf;
+    }
+
+    function init() {
+        scopeNode_.connect( trackGainNode_ );
+        scopeNode_.onaudioprocess = savePosition;
+    }
+
+    function savePosition( processEvent ) {
+        var inputBuffer = processEvent.inputBuffer.getChannelData( 0 );
+        lastPos = inputBuffer[ inputBuffer.length - 1 ] || 0;
+    }
+
+    function wrapAroundOnEnded( node, onended ) {
+        return function ( event ) {
+            node.playbackState = node.FINISHED_STATE;
+            if ( typeof onended === 'function' ) {
+                onended( event );
+            }
+        };
+    }
+
+    init();
+
+}
+//BE module.exports = SPAudioBufferSourceNode;
+
 
 //# sourceMappingURL=vendor.js.map
