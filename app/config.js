@@ -5,9 +5,10 @@ var params = {
     STYLE: {
       withColours: true,
       invertColours: false,
-      drawAllLevels: true
+      drawAllLevels: true,
+      drawLevelsTopDown: false,
     },
-    drawScanLines: true,
+    drawScanLines: false,
     FPS: 40
   },
 
@@ -21,7 +22,8 @@ var original = {
     STYLE: {
       withColours: false,
       invertColours: false,
-      drawAllLevels: true
+      drawAllLevels: true,
+      drawLevelsTopDown: true,
     },
     drawScanLines: false,
     FPS: 60

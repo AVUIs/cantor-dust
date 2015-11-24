@@ -126,6 +126,8 @@ p         Reset the phase to 0                   (A), (S)
 Shift-L   Toggle scanlines off/on (if your machine struggles,
                                    or if you get choppy sound)
 
+Shift-\   Cycle between visual themes
+
 ```
 
 **Experimental**: It is also possible to save the overall state of the instrument by encoding it to the URL, and later recreating it by visiting the same url:

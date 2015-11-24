@@ -4,6 +4,7 @@ import state  from 'state';
 import player from 'player';
 import audio from 'audio'
 import config from 'config'
+import themes from 'gui/themes';
 
 function initKeyboard() {
 
@@ -120,6 +121,8 @@ function initKeyboard() {
   key('shift+s', () => state.saveToURL()); // state -> url
 
   key('shift+l', () => { config.params.VISUALS.drawScanLines = !config.params.VISUALS.drawScanLines; gui.updateScanners() });
+
+  key('shift+\\', () => { themes.currentPalette = themes.nextPalette(); document.title = "Cantor Dust :: " + themes.currentPalette.name; gui.updateAll() } );
   
 }
 

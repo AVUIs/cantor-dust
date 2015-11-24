@@ -1,15 +1,6 @@
 'use strict';
 
-var solarized =
-    [[45,100,71], //yellow
-     [18,89,80],  //orange
-     [1,79,86],   //red
-     [331,74,83], //magenta
-     [237,45,77], //violet
-     [205,82,82], //blue
-     [175,74,63], //cyan
-     [68,100,60]  //green
-    ];
+import themes from 'gui/themes';
 
 function plotIteration(ctx, iteration, dimensions, STYLE) {
   if (typeof iteration === "undefined") return;
@@ -17,6 +8,8 @@ function plotIteration(ctx, iteration, dimensions, STYLE) {
   var i = iteration.length,
       segmentW = dimensions.w / i,
       c, y, h,s,l;
+
+  var currentPalette = themes.currentPalette.palette;
 
   if (STYLE.withColours)
     while (i--) {
@@ -30,11 +23,12 @@ function plotIteration(ctx, iteration, dimensions, STYLE) {
 
       //solarized & accurate (we vary the lightness/brightness of the colours)
       c = Math.round(100 * iteration[i]);
-      h = solarized[dimensions.segmentId][0];
-      s = solarized[dimensions.segmentId][1];
+      h = currentPalette[dimensions.segmentId][0];
+      s = currentPalette[dimensions.segmentId][1];
+      //if (STYLE.invertColours) c = 100-c;
       ctx.fillStyle = `hsl(${h}, ${s}%, ${c}%)`;
 
-      y = dimensions.y;      
+      y = dimensions.y;
       ctx.fillRect(segmentW * i, y, segmentW, dimensions.h);
     }
   else 
@@ -50,7 +44,8 @@ function plotIteration(ctx, iteration, dimensions, STYLE) {
 }
 
 function plot(ctx, cantor, dimensions, STYLE) {
-  var i = Math.min(cantor.length, 8),
+  var numLevels = Math.min(cantor.length, 8),
+      i = numLevels,
       h = dimensions.h,
       dim;
 
@@ -59,11 +54,14 @@ function plot(ctx, cantor, dimensions, STYLE) {
     plotIteration(ctx, cantor[i-1], dim, STYLE);
   }
   else {     
-    dimensions.h = h / i;
+    dimensions.h = h / numLevels;
   
     while (i--) {
       dim = Object.create(dimensions);
-      dim.y = dim.y + dim.h * i;
+      if (STYLE.drawLevelsTopDown)
+	dim.y = dim.y + dim.h * i;
+      else
+	dim.y = dim.y + dim.h * (numLevels - i);
       dim.level = i;
       plotIteration(ctx, cantor[i-1], dim, STYLE);
     }

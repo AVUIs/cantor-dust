@@ -5,6 +5,9 @@ import state  from 'state';
 import audio from 'audio';
 import config from 'config';
 
+import themes from 'gui/themes';
+
+
 var canvas = document.querySelector('canvas#fractal-layer'),
     ctx    = canvas.getContext('2d'),
     scannerCanvas = document.querySelector('canvas#scanner-layer'),
@@ -66,30 +69,43 @@ function updateSliders(n, params) {
 // http://jsfiddle.net/chicagogrooves/nRpVD/2/
 var fpsInterval = 1000 / config.params.VISUALS.FPS,
     startTime = window.performance.now(),
-    then = startTime,
+    timeThen = startTime,
     frameCount = 0;
     //$osd = document.getElementById("osd"),
 
 
-function updateScanners(now) {
-  if (!config.params.VISUALS.drawScanLines) 
+function suspendScanners(truefalse) {
+  if (truefalse === true) {
+    state.suspendScanners = true;
+  } else {
+    state.suspendScanners = false;
+    updateScanners();
+  }
+}
+
+function updateScanners(timeNow) {
+  if (!config.params.VISUALS.drawScanLines || state.suspendScanners) 
     return;
 
   // request another frame
   requestAnimationFrame(updateScanners);
 
-  var elapsed = now - then;
+  var elapsed = timeNow - timeThen;
 
   // if enough time has elapsed, draw the next frame
   if (elapsed > fpsInterval) {
 
     // Get ready for next frame by setting then=now, but...
     // Also, adjust for fpsInterval not being multiple of 16.67
-    then = now - (elapsed % fpsInterval);
+    timeThen = timeNow - (elapsed % fpsInterval);
     
     // draw stuff here        
-    scannerCtx.fillStyle = 'white';        
-    state.getActiveStateIds().map( (i) => updateScanner(i));
+    scannerCtx.fillStyle = 'white';
+    
+    var activeStates = state.getActiveStateIds();
+    for (var i=0; i<activeStates.length; i++) {
+      updateScanner(activeStates[i]);
+    }
         
     // TESTING...Report #seconds since start and achieved fps.
     // var sinceStart = now - startTime;
@@ -104,13 +120,16 @@ function updateScanner(i) {
   var dimI = dim(i),
       stateI = state.load(i),
       phaseI = audio.synths[i].phase;
-  
+
+    
   if (stateI.lastphaseOnScreen !== undefined) {
     scannerCtx.clearRect(stateI.lastphaseOnScreen-1, dimI.y-1, 2, dimI.h+2);
+    stateI.lastphaseOnScreen = undefined;
   }
-  else { //fallback to clearing the whole segment
-    scannerCtx.clearRect(dimI.x, dimI.y, dimI.w, dimI.h);
+  else { //fallback to clearing the whole segment?
+    // scannerCtx.clearRect(dimI.x, dimI.y, dimI.w, dimI.h);
   }
+
   
   if (phaseI !== undefined) {
     //FIXME: hacky
@@ -156,4 +175,4 @@ resizeCanvas();
 
 updateScanners();
 
-export default { updateCantor, updateIterations, updateSliders, updateScanners, STYLE };
+export default { updateCantor, updateIterations, updateSliders, updateScanners, suspendScanners, updateAll, STYLE};
