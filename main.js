@@ -178,7 +178,7 @@ var params = {
       drawAllLevels: true,
       drawLevelsTopDown: false
     },
-    drawScanLines: false,
+    drawScanLines: true,
     FPS: 40
   },
 
@@ -797,12 +797,12 @@ function initKeyboard() {
   // control the pitch (playrate) of the focused generator
   key(',', function () {
     return _audio2['default'].focusedSynth(function (s) {
-      return s.playRatechange(PLAYRATE_DOWN_FACTOR);
+      s.pitch *= PLAYRATE_DOWN_FACTOR;
     });
   });
   key('.', function () {
     return _audio2['default'].focusedSynth(function (s) {
-      return s.playRatechange(PLAYRATE_UP_FACTOR);
+      s.pitch *= PLAYRATE_UP_FACTOR;
     });
   });
   key('m', function () {
@@ -874,8 +874,11 @@ function initKeyboard() {
     return _state2['default'].saveToURL();
   }); // state -> url
 
+  key('l', function () {
+    var focused = _state2['default'].load(_state2['default'].focus);focused.updateScanner = !focused.updateScanner;
+  });
   key('shift+l', function () {
-    _config2['default'].params.VISUALS.drawScanLines = !_config2['default'].params.VISUALS.drawScanLines;_gui2['default'].updateScanners();
+    _gui2['default'].suspendScanners(!_state2['default'].suspendScanners);
   });
 
   key('shift+\\', function () {
@@ -1145,6 +1148,7 @@ var GibberishSamplerSynth = (function () {
 
     this.sampler = sampler;
     this.mutedvolume = undefined;
+    this.amp = 3;
     this.id = sampler.id;
 
     // a little hacky, but this is what Gibberish gives us
@@ -1340,15 +1344,12 @@ function suspendScanners(truefalse) {
     _state2['default'].suspendScanners = true;
   } else {
     _state2['default'].suspendScanners = false;
-    updateScanners();
   }
 }
 
-function updateScanners(timeNow) {
-  if (!_config2['default'].params.VISUALS.drawScanLines || _state2['default'].suspendScanners) return;
-
+function updateFrame(timeNow) {
   // request another frame
-  requestAnimationFrame(updateScanners);
+  requestAnimationFrame(updateFrame);
 
   var elapsed = timeNow - timeThen;
 
@@ -1364,7 +1365,18 @@ function updateScanners(timeNow) {
 
     var activeStates = _state2['default'].getActiveStateIds();
     for (var i = 0; i < activeStates.length; i++) {
-      updateScanner(activeStates[i]);
+      var stateid = activeStates[i],
+          stateI = _state2['default'].load(stateid);
+      if (stateI.updateIterations) {
+        updateIterations(stateid, stateI.iterations);
+        stateI.updateIterations = false;
+      }
+      if (stateI.updateCantor) {
+        updateCantor(stateid, stateI.cantor);
+        stateI.updateCantor = false;
+      }
+
+      if (_config2['default'].params.VISUALS.drawScanLines) if (stateI.updateScanner && !_state2['default'].suspendScanners) updateScanner(activeStates[i]);
     }
 
     // TESTING...Report #seconds since start and achieved fps.
@@ -1428,9 +1440,9 @@ function resizeCanvas() {
 window.onresize = resizeCanvas;
 resizeCanvas();
 
-updateScanners();
+updateFrame();
 
-exports['default'] = { updateCantor: updateCantor, updateIterations: updateIterations, updateSliders: updateSliders, updateScanners: updateScanners, suspendScanners: suspendScanners, updateAll: updateAll, STYLE: STYLE };
+exports['default'] = { updateCantor: updateCantor, updateIterations: updateIterations, updateSliders: updateSliders, suspendScanners: suspendScanners, updateAll: updateAll, STYLE: STYLE };
 module.exports = exports['default'];
 });
 
@@ -2367,7 +2379,7 @@ var WavetableSynth = (function () {
 
     // forward compatilibity
     this.id = options.id;
-    this.bufferSourceNodeType = options.bufferSourceNodeType || "AudioBufferSourceNode";
+    this.bufferSourceNodeType = options.bufferSourceNodeType || "SPAudioBufferSourceNode";
 
     var source = createBufferSource(audioCtx, this.bufferSourceNodeType),
         buffer = createBuffer(audioCtx, numSamples, 2, audioCtx.sampleRate);
@@ -2375,6 +2387,8 @@ var WavetableSynth = (function () {
     this.source = source;
     source.buffer = buffer;
     source.loop = true;
+
+    // FIXME: this has no effect here on firefox?!? it insists on setting it on 1
     source.playbackRate.value = 1 / 8;
 
     this.gain = audioCtx.createGain();
@@ -2388,13 +2402,8 @@ var WavetableSynth = (function () {
   _createClass(WavetableSynth, [{
     key: 'playRatechange',
     value: function playRatechange(factor) {
-      var rate = this.source.playbackRate.value;
-      rate *= factor;
-      // if (rate > 1)
-      //   rate = 1;
-      this.source.playbackRate.value = rate;
-      _state2['default'].load(this.id).pitch = rate;
-      return rate;
+      this.source.playbackRate.value *= factor;
+      _state2['default'].load(this.id).pitch = this.source.playbackRate.value;
     }
 
     // forward compatibility
@@ -2414,7 +2423,6 @@ var WavetableSynth = (function () {
   }, {
     key: 'wavetable',
     set: function set(samples) {
-      if (this.source) this.source.disconnect();
 
       var source = createBufferSource(audioCtx, this.bufferSourceNodeType);
 
@@ -2431,10 +2439,12 @@ var WavetableSynth = (function () {
       if (source.playbackPosition && this.source.playbackPosition) source.playbackPosition = this.source.playbackPosition;
 
       source.connect(this.gain);
+      source.start();
+
+      // disconnect the old source after starting the new one for a smoother transition
+      this.source.disconnect();
 
       this.source = source;
-
-      source.start();
     },
     get: function get() {
       var buffer = this.source.buffer;
@@ -2451,7 +2461,7 @@ var WavetableSynth = (function () {
 
     // forward compatibility
     get: function get() {
-      return this.source.playbackRate;
+      return this.source.playbackRate.value;
     }
   }, {
     key: 'amp',
@@ -2532,8 +2542,13 @@ function updateSynthAndGUI(i, data) {
     _audio2['default'].synths[i].phase = 0;
   }
 
-  _gui2['default'].updateIterations(i, data.iterations); //BE-raf:to-remove
-  _gui2['default'].updateCantor(i, cantor); //BE-raf:to-remove
+  // see gui.updateFrame where these are acted upon
+  _state2['default'].load(i).updateCantor = true;
+  _state2['default'].load(i).updateIterations = true;
+
+  // used to be drawn here
+  // gui.updateIterations(i, data.iterations); //BE-raf:to-remove
+  // gui.updateCantor(i, cantor); //BE-raf:to-remove
 }
 
 function resetWorker(i, cb) {
