@@ -22,6 +22,7 @@ class GibberishSamplerSynth {
 
     this.sampler = sampler;
     this.mutedvolume = undefined;
+    this.amp = 3;
     this.id = sampler.id;
 
     

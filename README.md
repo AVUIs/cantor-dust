@@ -122,9 +122,8 @@ p         Reset the phase to 0                   (A), (S)
 =         Increase the volume                    (A), (S)
 0         Toggle mute                            (A), (S)
 
+l         Toggle scanline on/off                 (S)
 
-Shift-L   Toggle scanlines off/on (if your machine struggles,
-                                   or if you get choppy sound)
 
 Shift-\   Cycle between visual themes
 

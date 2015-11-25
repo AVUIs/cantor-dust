@@ -8,7 +8,7 @@ var params = {
       drawAllLevels: true,
       drawLevelsTopDown: false,
     },
-    drawScanLines: false,
+    drawScanLines: true,
     FPS: 40
   },
 

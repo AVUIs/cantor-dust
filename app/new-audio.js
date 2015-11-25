@@ -47,7 +47,7 @@ class WavetableSynth {
   constructor(options) {
     // forward compatilibity
     this.id = options.id;
-    this.bufferSourceNodeType = options.bufferSourceNodeType || "AudioBufferSourceNode";
+    this.bufferSourceNodeType = options.bufferSourceNodeType || "SPAudioBufferSourceNode";
     
     var source = createBufferSource(audioCtx, this.bufferSourceNodeType),
         buffer = createBuffer(audioCtx, numSamples, 2, audioCtx.sampleRate);
@@ -55,8 +55,10 @@ class WavetableSynth {
     this.source = source;
     source.buffer = buffer;
     source.loop   = true;
-    source.playbackRate.value = 1 / 8;
 
+    // FIXME: this has no effect here on firefox?!? it insists on setting it on 1
+    source.playbackRate.value = 1/8;
+    
     this.gain = audioCtx.createGain();
     source.connect(this.gain);
     this.gain.connect(audioCtx.destination);
@@ -67,8 +69,6 @@ class WavetableSynth {
 
   
   set wavetable(samples) {
-    if (this.source)
-      this.source.disconnect();
     
     var source = createBufferSource(audioCtx, this.bufferSourceNodeType);
 
@@ -87,10 +87,13 @@ class WavetableSynth {
       source.playbackPosition = this.source.playbackPosition;
   
     source.connect(this.gain);
+    source.start();
 
+    // disconnect the old source after starting the new one for a smoother transition
+    this.source.disconnect();
+    
     this.source = source;
 
-    source.start();
   }
   
   get wavetable() {
@@ -107,18 +110,13 @@ class WavetableSynth {
 
   // forward compatibility
   get pitch() {
-    return this.source.playbackRate;
+    return this.source.playbackRate.value;
   }
 
   
   playRatechange(factor) {
-    var rate = this.source.playbackRate.value;
-    rate *= factor;
-    // if (rate > 1)
-    //   rate = 1;
-    this.source.playbackRate.value = rate;
-    state.load(this.id).pitch = rate;
-    return rate;
+    this.source.playbackRate.value *= factor;
+    state.load(this.id).pitch = this.source.playbackRate.value;
   }
     
   // forward compatibility

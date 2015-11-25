@@ -79,16 +79,12 @@ function suspendScanners(truefalse) {
     state.suspendScanners = true;
   } else {
     state.suspendScanners = false;
-    updateScanners();
   }
 }
 
-function updateScanners(timeNow) {
-  if (!config.params.VISUALS.drawScanLines || state.suspendScanners) 
-    return;
-
+function updateFrame(timeNow) {
   // request another frame
-  requestAnimationFrame(updateScanners);
+  requestAnimationFrame(updateFrame);
 
   var elapsed = timeNow - timeThen;
 
@@ -104,7 +100,20 @@ function updateScanners(timeNow) {
     
     var activeStates = state.getActiveStateIds();
     for (var i=0; i<activeStates.length; i++) {
-      updateScanner(activeStates[i]);
+      var stateid = activeStates[i],
+	  stateI = state.load(stateid);
+      if (stateI.updateIterations) {
+	updateIterations(stateid, stateI.iterations);
+	stateI.updateIterations = false;
+      }
+      if (stateI.updateCantor) {
+	updateCantor(stateid, stateI.cantor);
+	stateI.updateCantor = false;
+      }
+
+      if (config.params.VISUALS.drawScanLines)
+	if (stateI.updateScanner && !state.suspendScanners)
+	  updateScanner(activeStates[i]);
     }
         
     // TESTING...Report #seconds since start and achieved fps.
@@ -173,6 +182,6 @@ function resizeCanvas() {
 window.onresize = resizeCanvas;
 resizeCanvas();
 
-updateScanners();
+updateFrame();
 
-export default { updateCantor, updateIterations, updateSliders, updateScanners, suspendScanners, updateAll, STYLE};
+export default { updateCantor, updateIterations, updateSliders, suspendScanners, updateAll, STYLE};

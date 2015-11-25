@@ -89,8 +89,8 @@ function initKeyboard() {
       PLAYRATE_DOWN_FACTOR = 1/PLAYRATE_UP_FACTOR;
 
   // control the pitch (playrate) of the focused generator
-  key(',', () => audio.focusedSynth( (s) => s.playRatechange(PLAYRATE_DOWN_FACTOR)));
-  key('.', () => audio.focusedSynth( (s) => s.playRatechange(PLAYRATE_UP_FACTOR)));
+  key(',', () => audio.focusedSynth( (s) => { s.pitch *= PLAYRATE_DOWN_FACTOR } ));
+  key('.', () => audio.focusedSynth( (s) => { s.pitch *= PLAYRATE_UP_FACTOR } ));
   key('m', () => audio.focusedSynth( (s) => { s.pitch = 1/8; } ));
 
   // control the pitch (playrate) of all but the focused generator
@@ -120,7 +120,9 @@ function initKeyboard() {
 
   key('shift+s', () => state.saveToURL()); // state -> url
 
-  key('shift+l', () => { config.params.VISUALS.drawScanLines = !config.params.VISUALS.drawScanLines; gui.updateScanners() });
+
+  key('l', () => { var focused = state.load(state.focus); focused.updateScanner = !focused.updateScanner; }); 
+  key('shift+l', () => { gui.suspendScanners(!state.suspendScanners); });
 
   key('shift+\\', () => { themes.currentPalette = themes.nextPalette(); document.title = "Cantor Dust :: " + themes.currentPalette.name; gui.updateAll() } );
   

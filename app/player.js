@@ -18,9 +18,14 @@ function updateSynthAndGUI(i, data) {
     state.load(i).phase = 0;
     audio.synths[i].phase = 0;
   }
-  
-  gui.updateIterations(i, data.iterations); //BE-raf:to-remove
-  gui.updateCantor(i, cantor); //BE-raf:to-remove
+
+  // see gui.updateFrame where these are acted upon
+  state.load(i).updateCantor = true;
+  state.load(i).updateIterations = true;
+
+  // used to be drawn here
+  // gui.updateIterations(i, data.iterations); //BE-raf:to-remove
+  // gui.updateCantor(i, cantor); //BE-raf:to-remove
 }
 
 function resetWorker(i, cb) {
