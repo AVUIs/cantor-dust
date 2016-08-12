@@ -53,7 +53,7 @@
   var localRequire = function(path) {
     return function expanded(name) {
       var absolute = expand(dirname(path), name);
-      return require(absolute, path);
+      return globals.require(absolute, path);
     };
   };
 
@@ -112,15 +112,16 @@
 require.register("audio", function(exports, require, module) {
 'use strict';
 
-//import {synths,numSamples} from 'native-audio';
-//import {synths,numSamples} from 'gibberish-audio';
+// import {synths,numSamples} from 'native-audio';
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _newAudio = require('new-audio');
+var _gibberishAudio = require('gibberish-audio');
+
+// import {synths,numSamples} from 'new-audio';
 
 var _state = require('state');
 
@@ -132,7 +133,7 @@ function loadSynthParamsFromState() {
 
   ids.map(function (id) {
     var stateI = _state2['default'].load(id),
-        synthI = _newAudio.synths[id];
+        synthI = _gibberishAudio.synths[id];
 
     params.forEach(function (param, i) {
       if (stateI[param]) synthI[param] = stateI[param];
@@ -141,26 +142,26 @@ function loadSynthParamsFromState() {
 }
 
 function synth(i, fn) {
-  return fn(_newAudio.synths[i]);
+  return fn(_gibberishAudio.synths[i]);
 }
 
 function focusedSynth(fn) {
-  return fn(_newAudio.synths[_state2['default'].focus]);
+  return fn(_gibberishAudio.synths[_state2['default'].focus]);
 }
 
 function allSynths(fn) {
-  return _newAudio.synths.map(function (s, i) {
+  return _gibberishAudio.synths.map(function (s, i) {
     return fn(s);
   });
 }
 
 function allSynthsButFocused(fn) {
-  return _newAudio.synths.map(function (s, i) {
+  return _gibberishAudio.synths.map(function (s, i) {
     if (s.id != _state2['default'].focus) fn(s);
   });
 }
 
-exports['default'] = { synths: _newAudio.synths, numSamples: _newAudio.numSamples, loadSynthParamsFromState: loadSynthParamsFromState, focusedSynth: focusedSynth, allSynths: allSynths, allSynthsButFocused: allSynthsButFocused };
+exports['default'] = { synths: _gibberishAudio.synths, numSamples: _gibberishAudio.numSamples, loadSynthParamsFromState: loadSynthParamsFromState, focusedSynth: focusedSynth, allSynths: allSynths, allSynthsButFocused: allSynthsButFocused };
 module.exports = exports['default'];
 });
 
@@ -673,6 +674,14 @@ function initKeyboard() {
     return _controllersCmdLc1Controls2['default'].setFocus((_state2['default'].focus + 1) % 8);
   });
 
+  // let's have vi keys for this as well
+  key('k', function () {
+    return _controllersCmdLc1Controls2['default'].setFocus((_state2['default'].focus - 1 + 8) % 8);
+  });
+  key('j', function () {
+    return _controllersCmdLc1Controls2['default'].setFocus((_state2['default'].focus + 1) % 8);
+  });
+
   // increase/decrease the first slider
   key('q', function () {
     return adjustPatternAndUpdateSliders(0, 1);
@@ -883,6 +892,11 @@ function initKeyboard() {
 
   key('shift+\\', function () {
     _guiThemes2['default'].currentPalette = _guiThemes2['default'].nextPalette();document.title = "Cantor Dust :: " + _guiThemes2['default'].currentPalette.name;_gui2['default'].updateAll();
+  });
+
+  // shift+/ := ?
+  key('shift+/', function () {
+    _gui2['default'].toggleHelp();
   });
 }
 
@@ -1148,7 +1162,7 @@ var GibberishSamplerSynth = (function () {
 
     this.sampler = sampler;
     this.mutedvolume = undefined;
-    this.amp = 3;
+    this.amp = 1;
     this.id = sampler.id;
 
     // a little hacky, but this is what Gibberish gives us
@@ -1376,7 +1390,7 @@ function updateFrame(timeNow) {
         stateI.updateCantor = false;
       }
 
-      if (_config2['default'].params.VISUALS.drawScanLines) if (stateI.updateScanner && !_state2['default'].suspendScanners) updateScanner(activeStates[i]);
+      if (_config2['default'].params.VISUALS.drawScanLines) if (stateI.updateScanner !== false && !_state2['default'].suspendScanners) updateScanner(activeStates[i]);
     }
 
     // TESTING...Report #seconds since start and achieved fps.
@@ -1437,12 +1451,49 @@ function resizeCanvas() {
   scannerCanvas.height = canvas.height;
 }
 
+function isHidden(el) {
+  return el.offsetParent === null;
+}
+
+var usageText = "";
+var usageEl = document.getElementById("usage");
+function toggleHelp() {
+
+  if (isHidden(usageEl)) {
+    usageEl.style.display = 'block';
+    var height = window.innerHeight - 100;
+    usageEl.style.height = height + "px";
+  } else {
+    usageEl.style.display = "none";
+  }
+
+  if (usageText === "") {
+    usageEl.innerHTML = "Fetching...";
+
+    var req = new XMLHttpRequest();
+    req.addEventListener("load", function () {
+      var s = req.responseText;
+      if (req.status == 200) {
+        var b = s.indexOf("### Keyboard Controls");
+        var e = s.indexOf("## Notes");
+        usageText = s.substring(b, e).replace(/```/g, '');
+        usageEl.innerHTML = "<pre>" + usageText + "</pre>";
+      } else if (s.length == 0) {
+        usageEl.innerHTML = 'An error occurred while fetching from <a target="blank" href="https://github.com/AVUIs/cantor-dust/#keyboard-controls">github.com/AVUIS/cantor-dust/#keyboard-controls</a>';
+      }
+    });
+
+    req.open("GET", "https://raw.githubusercontent.com/AVUIs/cantor-dust/master/README.md", true);
+    req.send(null);
+  }
+}
+
 window.onresize = resizeCanvas;
 resizeCanvas();
 
 updateFrame();
 
-exports['default'] = { updateCantor: updateCantor, updateIterations: updateIterations, updateSliders: updateSliders, suspendScanners: suspendScanners, updateAll: updateAll, STYLE: STYLE };
+exports['default'] = { updateCantor: updateCantor, updateIterations: updateIterations, updateSliders: updateSliders, suspendScanners: suspendScanners, updateAll: updateAll, toggleHelp: toggleHelp, STYLE: STYLE };
 module.exports = exports['default'];
 });
 
