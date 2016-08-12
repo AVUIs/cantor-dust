@@ -9,6 +9,7 @@
       body {
          margin: 0;
          background: black;
+         overflow:hidden;
       }
       canvas {
          position: absolute;
@@ -24,11 +25,27 @@
          z-index: 2;
       }
 
+      div#usage {
+         z-index: 3;
+         display:none;
+         position: relative;
+         background-color: white;
+         font-family: monospace;
+     }
+      .center {
+        margin: auto;
+        margin-top: 30px;
+        margin-bottom: 0px;
+        width: 70%;
+        padding: 10px 10px;
+      }
+
     </style>
   </head>
   <body>
     <canvas id="fractal-layer"></canvas>
     <canvas id="scanner-layer"></canvas>
+    <div id="usage" class="center"></div>
 
     <script src="main.js" type="text/javascript" charset="utf-8"></script>
     <script src="vendor.js" type="text/javascript" charset="utf-8"></script>
