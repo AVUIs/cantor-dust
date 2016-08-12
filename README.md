@@ -11,7 +11,7 @@ To get a taste, try this [sinister drone sound](http://avuis.github.io/cantor-du
 
 (Make sure you have good headphones/speakers -- the more you stay with the sound, the more layers you will notice)
 
-And read the section on [keyboard controls](#keyboard-controls) below if you want to play with it yourself.
+And read the section on [keyboard controls](#keyboard-controls) below if you want to play with it yourself (also available by pressing '`?`')
 
 ## About
 
