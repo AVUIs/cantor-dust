@@ -24,7 +24,10 @@ function initKeyboard() {
   key('up', () => controls.setFocus((state.focus - 1 + 8)  % 8));
   key('down', () => controls.setFocus((state.focus + 1) % 8));
 
-  
+  // let's have vi keys for this as well
+  key('k', () => controls.setFocus((state.focus - 1 + 8)  % 8));
+  key('j', () => controls.setFocus((state.focus + 1) % 8));
+
   // increase/decrease the first slider
   key('q', () => adjustPatternAndUpdateSliders(0, 1) );
   key('a', () => adjustPatternAndUpdateSliders(0, -1));
@@ -125,6 +128,9 @@ function initKeyboard() {
   key('shift+l', () => { gui.suspendScanners(!state.suspendScanners); });
 
   key('shift+\\', () => { themes.currentPalette = themes.nextPalette(); document.title = "Cantor Dust :: " + themes.currentPalette.name; gui.updateAll() } );
+
+  // shift+/ := ?
+  key('shift+/', () => { gui.toggleHelp(); });
   
 }
 

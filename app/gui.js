@@ -112,7 +112,7 @@ function updateFrame(timeNow) {
       }
 
       if (config.params.VISUALS.drawScanLines)
-	if (stateI.updateScanner && !state.suspendScanners)
+	if (stateI.updateScanner !== false && !state.suspendScanners)
 	  updateScanner(activeStates[i]);
     }
         
@@ -179,9 +179,49 @@ function resizeCanvas() {
   scannerCanvas.height = canvas.height;
 }
 
+
+function isHidden(el) {
+  return (el.offsetParent === null);
+}
+
+
+var usageText = "";
+var usageEl = document.getElementById("usage");
+function toggleHelp() {
+
+  if (isHidden(usageEl)) {
+    usageEl.style.display = 'block';
+    var height = window.innerHeight - 100;
+    usageEl.style.height = height + "px";
+  } else {
+    usageEl.style.display = "none";
+  }
+
+  if (usageText === "") {
+    usageEl.innerHTML = "Fetching...";
+
+    var req = new XMLHttpRequest();
+    req.addEventListener("load", function() {
+      var s = req.responseText;
+      if (req.status == 200)  {
+        var b = s.indexOf("### Keyboard Controls");
+        var e = s.indexOf("## Notes");
+        usageText = s.substring(b,e).replace(/```/g,'');
+        usageEl.innerHTML = "<pre>" + usageText + "</pre>";
+      } else if (s.length == 0) {
+        usageEl.innerHTML = 'An error occurred while fetching from <a target="blank" href="https://github.com/AVUIs/cantor-dust/#keyboard-controls">github.com/AVUIS/cantor-dust/#keyboard-controls</a>';
+      }
+    });
+
+    req.open("GET", "https://raw.githubusercontent.com/AVUIs/cantor-dust/master/README.md", true);
+    req.send(null);
+  }
+  
+}
+
 window.onresize = resizeCanvas;
 resizeCanvas();
 
 updateFrame();
 
-export default { updateCantor, updateIterations, updateSliders, suspendScanners, updateAll, STYLE};
+export default { updateCantor, updateIterations, updateSliders, suspendScanners, updateAll, toggleHelp, STYLE};

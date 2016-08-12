@@ -83,11 +83,9 @@ Perform codegen on all dirty ugens and re-create the audio callback. This method
     }*/
     this.dirtied.length = 0;
     
-    this.codestring = ''
+    this.codestring = '\t'
     
     this.args = ['input']
-    
-    this.memo = {};
     
     this.out.codegen()
     
@@ -163,11 +161,11 @@ param **Audio Event** : Object. The HTML5 audio event object.
       
       if(me.isDirty) {
         _callback = me.createCallback();
-        //BE//try{ //BE let's remove the try-catch so that this function can be optimized
+        try{
           callback = me.callback = new Function( _callback[0], _callback[1] )
-        //BE//}catch( e ) {
-        //BE//  console.error( "ERROR WITH CALLBACK : \n\n", _callback )
-        //BE//}
+        }catch( e ) {
+          console.error( "ERROR WITH CALLBACK : \n\n", _callback )
+        }
         
         me.isDirty = false;
         objs = me.callbackObjects.slice(0)
@@ -1820,7 +1818,7 @@ param **amp** Number. The amplitude to be used to calculate output.
       // }
       // if( sign !== 0 ) signHistory = sign
       
-      return out;
+      return out * amp;
     }
   });
   
@@ -1955,6 +1953,7 @@ Gibberish.Noise = function() {
   this.processProperties(arguments);  
 };
 Gibberish.Noise.prototype = Gibberish._oscillator;
+
 // this file is dependent on oscillators.js
 
 /**#Gibberish.KarplusStrong - Physical Model
@@ -2045,6 +2044,7 @@ Gibberish.PolyKarplusStrong = function() {
     polyProperties : {
   		blend:			1,
       damping:    0,
+      velocity:   1
     },
 
     note : function(_frequency, velocity) {
@@ -4763,6 +4763,7 @@ param **amp** Number. Optional. The volume to use.
       }else{
         delete this.frequencies[ idx ]
       }
+      this.lastChild = idx
     },
  
     initVoices: function() {
@@ -5050,6 +5051,7 @@ param **amp** Number. Optional. The volume to use.
       }else{
         delete this.frequencies[ idx ]
       }
+      this.lastChild = idx
     },
     
     initVoices: function() {
@@ -5158,7 +5160,6 @@ param **amp** Number. Optional. The volume to use.
 	this.note = function(frequency, velocity) {
     if( typeof frequency === 'undefined' ) return
     //console.log( frequency, lastFrequency, this.releaseTrigger, velocity )
-    console.log( "VELOCITY", velocity )
     if( velocity !== 0 ) {
   		if(typeof this.frequency !== 'object'){
         if( useADSR && frequency === lastFrequency && properties.requireReleaseTrigger ) {
@@ -5786,10 +5787,10 @@ _pitch, amp, isRecording, isPlaying, input, length, start, end, loops, pan
     xhr.onload = function( e ) { initSound( this.response ) }
     xhr.send()
     
-    console.log("now loading sample", self.file )
+    //console.log("now loading sample", self.file )
     xhr.onerror = function( e ) { console.error( "Sampler file loading error", e )}
     
-    function initSound( arrayBuffer ) {
+    initSound = function( arrayBuffer ) {
       Gibberish.context.decodeAudioData(arrayBuffer, function(_buffer) {
         buffer = _buffer.getChannelData(0)
         // self.length = phase = self.end = bufferLength = buffer.length
@@ -5797,7 +5798,7 @@ _pitch, amp, isRecording, isPlaying, input, length, start, end, loops, pan
         self.isPlaying = true;
   			self.buffers[ self.file ] = buffer;
 
-  			console.log("sample loaded | ", self.file, " | length | ", bufferLength);
+        //console.log("sample loaded | ", self.file, " | length | ", bufferLength);
   			Gibberish.audioFiles[self.file] = buffer;
 			
         if(self.onload) self.onload();
@@ -7832,9 +7833,9 @@ Gibberish.Hat.prototype = Gibberish._oscillator;
     }
     
     // if already loaded, or if passed a buffer to use...
-    if( !SF.instruments[ this.instrumentFileName ] && typeof pathToResources !== 'object' ) {
+    if( !SF.instruments[ this.instrumentFileName ] && typeof this.resourcePath !== 'object' ) {
       console.log("DOWNLOADING SOUNDFONT")
-      getScript( 'resources/soundfonts/' + this.instrumentFileName + '-mp3.js', decodeBuffers.bind( null, this ) )
+      getScript( this.resourcePath + this.instrumentFileName + '-mp3.js', decodeBuffers.bind( null, this ) )
     }else{
       if( typeof pathToResources === 'object' ) {
         SF[ this.instrumentFileName ] = pathToResources

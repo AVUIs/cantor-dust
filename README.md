@@ -86,7 +86,8 @@ And make sure you first have a look at the section on keyboard controls below.
 
 ```
 1-8       Focus on the nth fractal generator
-up/down   Alternatively, shift the focus with the cursor keys
+down/up   Alternatively, shift the focus with the cursor keys
+j/k       ... or with VI keys
 ```
 
 All operations below effect the focused generator.
@@ -126,13 +127,7 @@ l         Toggle scanline on/off                 (S)
 
 
 Shift-\   Cycle between visual themes
-
-```
-
-**Experimental**: It is also possible to save the overall state of the instrument by encoding it to the URL, and later recreating it by visiting the same url:
-
-```
-Shift-S   Save overall state to URL (which you can copy, share, revisit, etc)
+Shift-s   Save overall state to URL (to copy, share, revisit, etc)
 ```
 
 ## Notes
